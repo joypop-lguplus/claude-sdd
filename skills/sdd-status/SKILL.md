@@ -1,3 +1,9 @@
+---
+name: sdd-status
+description: Use when the user wants to check SDD lifecycle progress, phase status, or checklist completion, or types /sdd-status.
+version: 0.3.0
+---
+
 # /sdd-status — SDD 상태 대시보드
 
 이 프로젝트의 SDD 라이프사이클 현재 상태를 표시합니다.

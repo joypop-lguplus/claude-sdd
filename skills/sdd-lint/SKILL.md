@@ -1,3 +1,9 @@
+---
+name: sdd-lint
+description: Use when the user wants to run code analysis — diagnostics, structural search, symbol extraction, or formatting, or types /sdd-lint.
+version: 0.3.0
+---
+
 # /sdd-lint — 코드 분석 및 진단
 
 자동화된 코드 분석을 실행합니다: 진단, 구조 검색, 심볼 추출, 포맷팅.

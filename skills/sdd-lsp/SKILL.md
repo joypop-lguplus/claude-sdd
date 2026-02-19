@@ -1,3 +1,9 @@
+---
+name: sdd-lsp
+description: Use when the user wants LSP-based semantic code analysis — diagnostics, go-to-definition, references, hover, symbols, implementations, or call hierarchy, or types /sdd-lsp.
+version: 0.3.0
+---
+
 # /sdd-lsp — LSP 기반 의미 분석
 
 Language Server Protocol을 활용한 의미 수준 코드 분석을 수행합니다: 진단, 정의 이동, 참조 찾기, 호버, 심볼, 구현, 호출 계층.

@@ -1,3 +1,9 @@
+---
+name: sdd
+description: Use when the user wants to continue the SDD lifecycle, asks "what's next", or types /sdd. Auto-detects the current phase and routes to the appropriate step.
+version: 0.3.0
+---
+
 # /sdd — SDD 라이프사이클 오케스트레이터
 
 스펙 주도 개발 (SDD) 라이프사이클의 메인 진입점입니다. 현재 프로젝트 상태에 따라 적절한 단계로 라우팅합니다.

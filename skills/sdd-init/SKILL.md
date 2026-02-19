@@ -1,3 +1,9 @@
+---
+name: sdd-init
+description: Use when the user wants to initialize a new or legacy project for Spec-Driven Development, or types /sdd-init.
+version: 0.3.0
+---
+
 # /sdd-init — SDD 프로젝트 초기화
 
 현재 프로젝트를 스펙 주도 개발 (SDD)용으로 초기화합니다.

@@ -1,3 +1,9 @@
+---
+name: sdd-review
+description: Use when the user wants to verify quality gates against spec compliance checklists, or types /sdd-review.
+version: 0.3.0
+---
+
 # /sdd-review — 품질 게이트 검증
 
 스펙 준수 체크리스트에 대한 종합적인 품질 검증을 수행합니다.

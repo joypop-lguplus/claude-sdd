@@ -1,3 +1,9 @@
+---
+name: sdd-build
+description: Use when the user wants to implement work packages using Agent Teams with quality loops, or types /sdd-build.
+version: 0.3.0
+---
+
 # /sdd-build — Agent Teams를 통한 구현
 
 리더 주도의 품질 루프를 갖춘 Claude Code Agent Teams를 사용하여 워크 패키지를 실행합니다.

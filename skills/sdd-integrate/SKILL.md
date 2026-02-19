@@ -1,3 +1,9 @@
+---
+name: sdd-integrate
+description: Use when the user wants to finalize implementation with tests, documentation, and PR creation, or types /sdd-integrate.
+version: 0.3.0
+---
+
 # /sdd-integrate — 통합, PR 및 문서화
 
 테스트, 문서화, 풀 리퀘스트를 포함하여 구현을 마무리합니다.

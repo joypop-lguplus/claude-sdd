@@ -1,3 +1,9 @@
+---
+name: sdd-spec
+description: Use when the user wants to generate technical specifications and compliance checklists from requirements, or types /sdd-spec.
+version: 0.3.0
+---
+
 # /sdd-spec — 기술 명세서 생성
 
 요구사항을 상세한 기술 명세서와 스펙 준수 체크리스트로 변환합니다.

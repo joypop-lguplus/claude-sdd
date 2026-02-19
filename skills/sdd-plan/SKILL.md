@@ -1,3 +1,9 @@
+---
+name: sdd-plan
+description: Use when the user wants to decompose specs into work packages and assign to Agent Teams, or types /sdd-plan.
+version: 0.3.0
+---
+
 # /sdd-plan — 태스크 분해 및 팀 배정
 
 스펙을 병렬 처리 가능한 워크 패키지로 분해하고 Agent Teams 멤버에게 배정합니다.
