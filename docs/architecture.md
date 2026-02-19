@@ -17,17 +17,17 @@ claude-sdd는 스펙 주도 개발 (SDD) 라이프사이클을 구현하는 Clau
 ```
 claude-sdd/
 ├── Skills (11)        # 사용자용 슬래시 명령어
-│   ├── /claude-sdd:auto      # 오케스트레이터 (단계 자동 감지)
-│   ├── /claude-sdd:init      # 프로젝트 초기화
-│   ├── /claude-sdd:intake    # 요구사항 수집
-│   ├── /claude-sdd:spec      # 스펙 생성
-│   ├── /claude-sdd:plan      # 태스크 분해
-│   ├── /claude-sdd:build     # Agent Teams 구현
-│   ├── /claude-sdd:review    # 품질 게이트
-│   ├── /claude-sdd:integrate # PR 및 문서화
-│   ├── /claude-sdd:status    # 대시보드
-│   ├── /claude-sdd:lint      # 코드 분석 및 진단
-│   └── /claude-sdd:lsp       # LSP 기반 의미 분석
+│   ├── /claude-sdd:sdd-auto      # 오케스트레이터 (단계 자동 감지)
+│   ├── /claude-sdd:sdd-init      # 프로젝트 초기화
+│   ├── /claude-sdd:sdd-intake    # 요구사항 수집
+│   ├── /claude-sdd:sdd-spec      # 스펙 생성
+│   ├── /claude-sdd:sdd-plan      # 태스크 분해
+│   ├── /claude-sdd:sdd-build     # Agent Teams 구현
+│   ├── /claude-sdd:sdd-review    # 품질 게이트
+│   ├── /claude-sdd:sdd-integrate # PR 및 문서화
+│   ├── /claude-sdd:sdd-status    # 대시보드
+│   ├── /claude-sdd:sdd-lint      # 코드 분석 및 진단
+│   └── /claude-sdd:sdd-lsp       # LSP 기반 의미 분석
 │
 ├── Agents (5)         # 전문 작업용 서브에이전트
 │   ├── requirements-analyst  # 소스 파싱
@@ -63,32 +63,32 @@ claude-sdd/
 사용자 요구사항
     |
     v
-[/claude-sdd:intake] --> 01-requirements.md
+[/claude-sdd:sdd-intake] --> 01-requirements.md
     |
     v
-[/claude-sdd:spec]   --> 02-architecture.md (또는 02-change-impact.md)
+[/claude-sdd:sdd-spec]   --> 02-architecture.md (또는 02-change-impact.md)
                      --> 03-api-spec.md (또는 03-api-changes.md)
                      --> 04-data-model.md (또는 04-data-migration.md)
                      --> 05-component-breakdown.md (또는 05-component-changes.md)
                      --> 06-spec-checklist.md
     |
     v
-[/claude-sdd:plan]   --> 07-task-plan.md + wp-*-member.md
+[/claude-sdd:sdd-plan]   --> 07-task-plan.md + wp-*-member.md
     |
     v
-[/claude-sdd:build]  --> 소스 코드 + 테스트
+[/claude-sdd:sdd-build]  --> 소스 코드 + 테스트
                      --> 업데이트된 06-spec-checklist.md
     |
     v
-[/claude-sdd:review] --> 08-review-report.md
+[/claude-sdd:sdd-review] --> 08-review-report.md
     |                  (항목 실패 시 빌드 단계로 루프백)
     v
-[/claude-sdd:integrate] --> Git 브랜치, PR, CHANGELOG
+[/claude-sdd:sdd-integrate] --> Git 브랜치, PR, CHANGELOG
 ```
 
 ## Agent Teams 아키텍처
 
-`/claude-sdd:build` 단계에서 플러그인은 Claude Code Agent Teams를 사용합니다:
+`/claude-sdd:sdd-build` 단계에서 플러그인은 Claude Code Agent Teams를 사용합니다:
 
 ```
 리더 세션 (Opus)
@@ -112,7 +112,7 @@ claude-sdd/
 코드 분석 레이어는 SDD 라이프사이클 전반에 걸쳐 자동화된 품질 검사를 제공합니다:
 
 ```
-/claude-sdd:lint                  sdd-code-analyzer 에이전트
+/claude-sdd:sdd-lint                  sdd-code-analyzer 에이전트
     |                                     |
     |-- diagnostics [path]  <--- 네이티브 도구 (tsc, ruff, cargo check, go vet)
     |-- search <pattern>    <--- ast-grep 구조 검색
@@ -120,7 +120,7 @@ claude-sdd/
     |-- format [path]       <--- 포매터 (prettier, ruff format, gofmt)
     |
     v
-/claude-sdd:lsp                   LSP 기반 의미 분석 (보완)
+/claude-sdd:sdd-lsp                   LSP 기반 의미 분석 (보완)
     |                                     |
     |-- diagnostics <file>  <--- Language Server 의미 진단
     |-- definition          <--- 정의 이동
@@ -137,12 +137,12 @@ scripts/sdd-detect-tools.sh      언어 및 사용 가능한 도구/LSP 서버 �
 sdd-config.yaml (lint/lsp 섹션)  프로젝트별 도구 설정
 ```
 
-대체 전략: LSP 서버 미설치 → `/claude-sdd:lint` 네이티브 도구 → ast-grep → Grep/Glob
+대체 전략: LSP 서버 미설치 → `/claude-sdd:sdd-lint` 네이티브 도구 → ast-grep → Grep/Glob
 
 통합 지점:
-- `/claude-sdd:spec` (레거시): 코드베이스 이해를 위한 심볼 추출 (LSP 또는 ast-grep)
-- `/claude-sdd:build`: 워크 패키지 완료 전 LSP 진단 + 린트/포맷 실행
-- `/claude-sdd:review`: 품질 게이트 (2.5단계)에 LSP + 네이티브 진단 포함
+- `/claude-sdd:sdd-spec` (레거시): 코드베이스 이해를 위한 심볼 추출 (LSP 또는 ast-grep)
+- `/claude-sdd:sdd-build`: 워크 패키지 완료 전 LSP 진단 + 린트/포맷 실행
+- `/claude-sdd:sdd-review`: 품질 게이트 (2.5단계)에 LSP + 네이티브 진단 포함
 
 ## 품질 루프
 

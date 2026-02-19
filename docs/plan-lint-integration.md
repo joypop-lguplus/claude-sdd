@@ -4,7 +4,7 @@
 
 oh-my-opencode의 LSP 구현(32개 TypeScript 파일, 6개 LSP 도구, ast-grep 통합)과 OpenCode 자체의 LSP/포매터 기능을 참고하여, claude-sdd의 SDD 라이프사이클에 코드 분석 기능을 통합한다.
 
-**핵심 목표**: `/claude-sdd:review` 품질 게이트와 `/claude-sdd:build` 구현 단계에서 자동화된 코드 품질 검증을 추가한다.
+**핵심 목표**: `/claude-sdd:sdd-review` 품질 게이트와 `/claude-sdd:sdd-build` 구현 단계에서 자동화된 코드 품질 검증을 추가한다.
 
 **접근법**: oh-my-opencode의 개념(진단, 심볼, 검색, 포매팅)을 Claude Code 플러그인 형태(스킬 + 에이전트)로 재구현. 전체 LSP 클라이언트가 아닌, ast-grep + 네이티브 도구 조합의 경량 접근법.
 
@@ -21,7 +21,7 @@ oh-my-opencode의 LSP 구현(32개 TypeScript 파일, 6개 LSP 도구, ast-grep 
 
 | 파일 | 역할 |
 |------|------|
-| `skills/sdd-lint/SKILL.md` | `/claude-sdd:lint` 스킬 — 진단, 구조 검색, 포매팅 |
+| `skills/sdd-lint/SKILL.md` | `/claude-sdd:sdd-lint` 스킬 — 진단, 구조 검색, 포매팅 |
 | `agents/sdd-code-analyzer.md` | 코드 분석 에이전트 — ast-grep + 네이티브 도구 |
 | `scripts/sdd-detect-tools.sh` | 프로젝트 언어/도구 자동 감지 스크립트 |
 | `templates/project-init/lint-config.yaml.tmpl` | 프로젝트별 린트/포맷 도구 설정 템플릿 |
@@ -44,24 +44,24 @@ oh-my-opencode의 LSP 구현(32개 TypeScript 파일, 6개 LSP 도구, ast-grep 
 
 | 파일 | 변경 내용 |
 |------|-----------|
-| `README.md` | `/claude-sdd:lint` 스킬, 코드 분석 에이전트 문서화 |
+| `README.md` | `/claude-sdd:sdd-lint` 스킬, 코드 분석 에이전트 문서화 |
 | `CHANGELOG.md` | v0.2.0 변경 사항 추가 |
 | `docs/architecture.md` | 코드 분석 레이어 추가 |
-| `docs/usage-guide.md` | `/claude-sdd:lint` 사용 예시 추가 |
+| `docs/usage-guide.md` | `/claude-sdd:sdd-lint` 사용 예시 추가 |
 
 ---
 
 ## 상세 설계
 
-### 1. `/claude-sdd:lint` 스킬 (`skills/sdd-lint/SKILL.md`)
+### 1. `/claude-sdd:sdd-lint` 스킬 (`skills/sdd-lint/SKILL.md`)
 
 oh-my-opencode의 6개 LSP 도구를 4개 서브커맨드로 매핑:
 
 ```
-/claude-sdd:lint diagnostics [path]      # 프로젝트 에러/경고 수집 (tsc, ruff, cargo check 등)
-/claude-sdd:lint search <pattern> [path] # ast-grep 구조적 코드 검색
-/claude-sdd:lint symbols [path]          # 함수/클래스/export 심볼 추출
-/claude-sdd:lint format [path]           # 코드 포매팅 (prettier, biome, rustfmt 등)
+/claude-sdd:sdd-lint diagnostics [path]      # 프로젝트 에러/경고 수집 (tsc, ruff, cargo check 등)
+/claude-sdd:sdd-lint search <pattern> [path] # ast-grep 구조적 코드 검색
+/claude-sdd:sdd-lint symbols [path]          # 함수/클래스/export 심볼 추출
+/claude-sdd:sdd-lint format [path]           # 코드 포매팅 (prettier, biome, rustfmt 등)
 ```
 
 **언어별 도구 매핑** (oh-my-opencode의 server-definitions.ts + OpenCode 포매터 참고):
@@ -88,9 +88,9 @@ oh-my-opencode의 LSP 도구 6개에 대응하는 분석 역할:
 - **포맷 검증**: 포매터 dry-run으로 스타일 위반 검출
 
 SDD 라이프사이클과의 통합:
-- `/claude-sdd:spec` 단계: 레거시 프로젝트에서 기존 코드 구조 분석
-- `/claude-sdd:build` 단계: 구현 완료 시 자동 린트/포맷
-- `/claude-sdd:review` 단계: 진단 결과를 품질 게이트에 포함
+- `/claude-sdd:sdd-spec` 단계: 레거시 프로젝트에서 기존 코드 구조 분석
+- `/claude-sdd:sdd-build` 단계: 구현 완료 시 자동 린트/포맷
+- `/claude-sdd:sdd-review` 단계: 진단 결과를 품질 게이트에 포함
 
 ### 3. `scripts/sdd-detect-tools.sh`
 
@@ -117,7 +117,7 @@ SDD 라이프사이클과의 통합:
 
 ### 4. 기존 스킬/에이전트 수정
 
-**`/claude-sdd:review` 수정**: Step 2.5로 "자동 진단 실행" 추가
+**`/claude-sdd:sdd-review` 수정**: Step 2.5로 "자동 진단 실행" 추가
 ```
 Step 2.5: Automated Diagnostics
   1. Run sdd-code-analyzer agent for diagnostics
@@ -126,7 +126,7 @@ Step 2.5: Automated Diagnostics
   4. Include in review report under "Automated Checks" section
 ```
 
-**`/claude-sdd:build` 수정**: 팀 멤버 완료 보고 전 린트/포맷 권장 추가
+**`/claude-sdd:sdd-build` 수정**: 팀 멤버 완료 보고 전 린트/포맷 권장 추가
 ```
 Before reporting completion:
   1. Run project formatter (if configured)

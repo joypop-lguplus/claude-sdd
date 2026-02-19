@@ -1,17 +1,17 @@
 ---
-name: review
+name: sdd-review
 description: Use when the user wants to verify quality gates against spec compliance checklists.
 ---
 
-# /claude-sdd:review — 품질 게이트 검증
+# /claude-sdd:sdd-review — 품질 게이트 검증
 
 스펙 준수 체크리스트에 대한 종합적인 품질 검증을 수행합니다.
 
 ## 사용법
 
 ```
-/claude-sdd:review              # 전체 리뷰
-/claude-sdd:review quick        # 체크리스트 상태만 확인 (코드 검증 없음)
+/claude-sdd:sdd-review              # 전체 리뷰
+/claude-sdd:sdd-review quick        # 체크리스트 상태만 확인 (코드 검증 없음)
 ```
 
 ## 동작
@@ -84,7 +84,7 @@ description: Use when the user wants to verify quality gates against spec compli
   - API-003: 422 에러 핸들러 → UserController에 누락
   - TEST-002: 통합 테스트 → 테스트 파일 없음
 
-권장 사항: /claude-sdd:build로 돌아가 재작업
+권장 사항: /claude-sdd:sdd-build로 돌아가 재작업
 ```
 
 모든 항목이 통과한 경우:
@@ -92,7 +92,7 @@ description: Use when the user wants to verify quality gates against spec compli
 품질 게이트: 통과 (28/28 항목, 100%)
 모든 테스트 통과.
 
-다음 단계: /claude-sdd:integrate — PR 생성 및 마무리
+다음 단계: /claude-sdd:sdd-integrate — PR 생성 및 마무리
 ```
 
 항목이 실패한 경우:
@@ -100,10 +100,10 @@ description: Use when the user wants to verify quality gates against spec compli
 품질 게이트: 실패 (25/28 항목, 89%)
 3개 항목 재작업 필요.
 
-다음 항목을 수정하려면 /claude-sdd:build를 실행하세요:
+다음 항목을 수정하려면 /claude-sdd:sdd-build를 실행하세요:
   - API-003, TEST-002, SEC-001
 
-또는 수정 후 진행 상황을 확인하려면 /claude-sdd:review quick을 실행하세요.
+또는 수정 후 진행 상황을 확인하려면 /claude-sdd:sdd-review quick을 실행하세요.
 ```
 
 ## 출력
@@ -112,5 +112,5 @@ description: Use when the user wants to verify quality gates against spec compli
 
 ## 의존성
 
-- `docs/specs/06-spec-checklist.md` (`/claude-sdd:spec`에서 생성)
-- 구현 코드 (`/claude-sdd:build`에서 생성)
+- `docs/specs/06-spec-checklist.md` (`/claude-sdd:sdd-spec`에서 생성)
+- 구현 코드 (`/claude-sdd:sdd-build`에서 생성)

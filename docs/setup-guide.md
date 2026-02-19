@@ -50,7 +50,7 @@ Claude Code 설정에 다음을 추가합니다:
 }
 ```
 
-이 설정은 병렬 Agent Teams를 사용하는 `/claude-sdd:build` 단계에 필수입니다.
+이 설정은 병렬 Agent Teams를 사용하는 `/claude-sdd:sdd-build` 단계에 필수입니다.
 
 ## 3단계: MCP 설정 (선택)
 
@@ -82,7 +82,7 @@ claude mcp add mcp-atlassian -s user -- \
 
 ## 4단계: Language Server 설치 (선택)
 
-`/claude-sdd:lsp` 의미 분석을 사용하려면 프로젝트 언어에 맞는 Language Server를 설치합니다:
+`/claude-sdd:sdd-lsp` 의미 분석을 사용하려면 프로젝트 언어에 맞는 Language Server를 설치합니다:
 
 ```bash
 # TypeScript/JavaScript
@@ -103,7 +103,7 @@ rustup component add rust-analyzer
 # Ubuntu: apt install clangd
 ```
 
-Language Server 없이도 SDD를 사용할 수 있습니다. `/claude-sdd:lint`가 네이티브 도구로 대체합니다.
+Language Server 없이도 SDD를 사용할 수 있습니다. `/claude-sdd:sdd-lint`가 네이티브 도구로 대체합니다.
 
 ## 5단계: 설치 확인
 
@@ -122,14 +122,14 @@ npx github:joypop-lguplus/claude-sdd doctor
 claude
 
 # 프로젝트 초기화
-/claude-sdd:init new      # 신규 프로젝트
-/claude-sdd:init legacy   # 기존 코드베이스
+/claude-sdd:sdd-init new      # 신규 프로젝트
+/claude-sdd:sdd-init legacy   # 기존 코드베이스
 
 # 상태 확인
-/claude-sdd:status
+/claude-sdd:sdd-status
 
 # 라이프사이클 시작
-/claude-sdd:auto
+/claude-sdd:sdd-auto
 ```
 
 ## 문제 해결
@@ -145,9 +145,9 @@ cat ~/.claude/settings.json
 ### "Confluence/Jira MCP not configured"
 
 MCP 없이도 SDD를 사용할 수 있습니다. 요구사항 수집에 다음 대안을 사용하세요:
-- `/claude-sdd:intake file:path/to/doc.md` -- 로컬 문서 읽기
-- `/claude-sdd:intake interview` -- 대화형 요구사항 수집
-- `/claude-sdd:intake figma:URL` -- Figma 디자인 분석
+- `/claude-sdd:sdd-intake file:path/to/doc.md` -- 로컬 문서 읽기
+- `/claude-sdd:sdd-intake interview` -- 대화형 요구사항 수집
+- `/claude-sdd:sdd-intake figma:URL` -- Figma 디자인 분석
 
 ### 플러그인을 찾을 수 없는 경우
 

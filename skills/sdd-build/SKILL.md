@@ -1,24 +1,24 @@
 ---
-name: build
+name: sdd-build
 description: Use when the user wants to implement work packages using Agent Teams with quality loops.
 ---
 
-# /claude-sdd:build — Agent Teams를 통한 구현
+# /claude-sdd:sdd-build — Agent Teams를 통한 구현
 
 리더 주도의 품질 루프를 갖춘 Claude Code Agent Teams를 사용하여 워크 패키지를 실행합니다.
 
 ## 사용법
 
 ```
-/claude-sdd:build                 # 빌드 단계 시작/재개
-/claude-sdd:build wp-1            # 특정 워크 패키지만 빌드
-/claude-sdd:build wp-1 rework     # 특정 패키지에 피드백 기반 재작업
+/claude-sdd:sdd-build                 # 빌드 단계 시작/재개
+/claude-sdd:sdd-build wp-1            # 특정 워크 패키지만 빌드
+/claude-sdd:sdd-build wp-1 rework     # 특정 패키지에 피드백 기반 재작업
 ```
 
 ## 사전 조건
 
 - `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`이 활성화되어야 함
-- `docs/specs/07-task-plan.md`가 존재해야 함 (`/claude-sdd:plan`에서 생성)
+- `docs/specs/07-task-plan.md`가 존재해야 함 (`/claude-sdd:sdd-plan`에서 생성)
 - `docs/specs/06-spec-checklist.md`가 존재해야 함
 
 ## 핵심 메커니즘: 품질 루프
@@ -111,9 +111,9 @@ description: Use when the user wants to implement work packages using Agent Team
 워크 패키지를 완료로 표시하기 전에 코드 품질을 확인합니다:
 
 1. **프로젝트 포매터 실행** (설정된 경우): 수정된 파일 자동 포맷
-   - `/claude-sdd:lint format --fix` 또는 프로젝트에 설정된 포매터 사용
+   - `/claude-sdd:sdd-lint format --fix` 또는 프로젝트에 설정된 포매터 사용
 2. **프로젝트 린터 실행** (설정된 경우): 린트 에러 확인
-   - `/claude-sdd:lint diagnostics` 또는 프로젝트에 설정된 진단 도구 사용
+   - `/claude-sdd:sdd-lint diagnostics` 또는 프로젝트에 설정된 진단 도구 사용
 3. 체크리스트 항목을 `[x]`로 표시하기 전에 **모든 문제 수정**
 
 ```
@@ -123,7 +123,7 @@ description: Use when the user wants to implement work packages using Agent Team
   3. 모든 체크리스트 항목 검증 완료 [x]
 ```
 
-이 단계는 권장 사항이지만 필수는 아닙니다. `/claude-sdd:review` 품질 게이트에서 나머지 문제를 잡아냅니다.
+이 단계는 권장 사항이지만 필수는 아닙니다. `/claude-sdd:sdd-review` 품질 게이트에서 나머지 문제를 잡아냅니다.
 
 ### 4단계: 단계 전환
 
@@ -137,7 +137,7 @@ description: Use when the user wants to implement work packages using Agent Team
 모든 워크 패키지: 4/4 완료
 체크리스트 진행률: 28/28 항목 완료 (100%)
 
-다음 단계: /claude-sdd:review — 품질 게이트 검증 실행
+다음 단계: /claude-sdd:sdd-review — 품질 게이트 검증 실행
 ```
 
 ## 출력
@@ -148,6 +148,6 @@ description: Use when the user wants to implement work packages using Agent Team
 
 ## 의존성
 
-- `docs/specs/07-task-plan.md` (`/claude-sdd:plan`에서 생성)
-- `docs/specs/06-spec-checklist.md` (`/claude-sdd:spec`에서 생성)
+- `docs/specs/07-task-plan.md` (`/claude-sdd:sdd-plan`에서 생성)
+- `docs/specs/06-spec-checklist.md` (`/claude-sdd:sdd-spec`에서 생성)
 - Agent Teams 활성화 (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)

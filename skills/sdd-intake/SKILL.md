@@ -1,21 +1,21 @@
 ---
-name: intake
+name: sdd-intake
 description: Use when the user wants to gather requirements from Confluence, Jira, Figma, files, or interviews for the SDD lifecycle.
 ---
 
-# /claude-sdd:intake — 요구사항 수집
+# /claude-sdd:sdd-intake — 요구사항 수집
 
 다양한 소스에서 요구사항을 수집하고 표준화된 요구사항 문서로 구조화합니다.
 
 ## 사용법
 
 ```
-/claude-sdd:intake confluence:<page-id>     # Confluence 페이지에서 가져오기
-/claude-sdd:intake jira:<epic-key>          # Jira 에픽 + 스토리에서 가져오기
-/claude-sdd:intake figma:<url>              # Figma 디자인 비전 분석
-/claude-sdd:intake file:<path>              # 로컬 문서 읽기
-/claude-sdd:intake interview                # 대화형 요구사항 인터뷰
-/claude-sdd:intake                          # 사용자에게 소스 선택 요청
+/claude-sdd:sdd-intake confluence:<page-id>     # Confluence 페이지에서 가져오기
+/claude-sdd:sdd-intake jira:<epic-key>          # Jira 에픽 + 스토리에서 가져오기
+/claude-sdd:sdd-intake figma:<url>              # Figma 디자인 비전 분석
+/claude-sdd:sdd-intake file:<path>              # 로컬 문서 읽기
+/claude-sdd:sdd-intake interview                # 대화형 요구사항 인터뷰
+/claude-sdd:sdd-intake                          # 사용자에게 소스 선택 요청
 ```
 
 ## 인자
@@ -36,7 +36,7 @@ description: Use when the user wants to gather requirements from Confluence, Jir
    ```
    Confluence MCP가 환경에 구성되어 있지 않습니다.
    설정하려면 Claude Code MCP 설정에 mcp-atlassian을 추가하세요.
-   또는 페이지를 내보낸 후 다음을 사용하세요: /claude-sdd:intake file:<exported-file>
+   또는 페이지를 내보낸 후 다음을 사용하세요: /claude-sdd:sdd-intake file:<exported-file>
    ```
 3. 페이지 콘텐츠를 파싱하고 요구사항을 추출합니다.
 4. `confluence_get_page_children`로 하위 페이지를 확인하고 포함 여부를 제안합니다.
@@ -75,7 +75,7 @@ description: Use when the user wants to gather requirements from Confluence, Jir
 
 ### 다중 소스
 
-여러 번의 `/claude-sdd:intake` 호출을 결합할 수 있습니다. 각 호출은 기존 `01-requirements.md`에 추가하거나 업데이트합니다.
+여러 번의 `/claude-sdd:sdd-intake` 호출을 결합할 수 있습니다. 각 호출은 기존 `01-requirements.md`에 추가하거나 업데이트합니다.
 
 ## 출력
 
@@ -95,10 +95,10 @@ description: Use when the user wants to gather requirements from Confluence, Jir
   - X개의 기능 요구사항
   - Y개의 비기능 요구사항
 
-다음 단계: /claude-sdd:spec — 기술 명세서 생성
+다음 단계: /claude-sdd:sdd-spec — 기술 명세서 생성
 ```
 
 ## 의존성
 
-- `docs/specs/sdd-config.yaml`이 존재해야 함 (먼저 `/claude-sdd:init` 실행)
+- `docs/specs/sdd-config.yaml`이 존재해야 함 (먼저 `/claude-sdd:sdd-init` 실행)
 - Confluence/Jira MCP 도구 (원격 소스의 경우, 선택 사항)

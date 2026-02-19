@@ -47,5 +47,5 @@ else
   echo -e "${BOLD}${BLUE}[SDD]${RESET} 단계: ${DIM}인테이크 (요구사항 수집)${RESET}"
 fi
 
-echo -e "${DIM}  전체 대시보드를 보려면 /claude-sdd:status 를 사용하세요${RESET}"
+echo -e "${DIM}  전체 대시보드를 보려면 /claude-sdd:sdd-status 를 사용하세요${RESET}"
 echo ""

@@ -1,17 +1,17 @@
 ---
-name: plan
+name: sdd-plan
 description: Use when the user wants to decompose specs into work packages and assign to Agent Teams.
 ---
 
-# /claude-sdd:plan — 태스크 분해 및 팀 배정
+# /claude-sdd:sdd-plan — 태스크 분해 및 팀 배정
 
 스펙을 병렬 처리 가능한 워크 패키지로 분해하고 Agent Teams 멤버에게 배정합니다.
 
 ## 사용법
 
 ```
-/claude-sdd:plan              # 스펙으로부터 태스크 계획 생성
-/claude-sdd:plan rebalance    # 현재 진행 상황에 따라 태스크 재분배
+/claude-sdd:sdd-plan              # 스펙으로부터 태스크 계획 생성
+/claude-sdd:sdd-plan rebalance    # 현재 진행 상황에 따라 태스크 재분배
 ```
 
 ## 동작
@@ -20,7 +20,7 @@ description: Use when the user wants to decompose specs into work packages and a
 
 1. `docs/specs/06-spec-checklist.md`를 읽어 전체 항목 목록을 확인합니다.
 2. `docs/specs/02-*.md`부터 `05-*.md`까지 스펙 세부 사항을 읽습니다.
-3. 스펙이 존재하지 않으면 안내합니다: `먼저 /claude-sdd:spec을 실행하여 명세서를 생성하세요.`
+3. 스펙이 존재하지 않으면 안내합니다: `먼저 /claude-sdd:sdd-spec을 실행하여 명세서를 생성하세요.`
 
 ### 태스크 분해
 
@@ -68,7 +68,7 @@ description: Use when the user wants to decompose specs into work packages and a
 - `{{SPEC_SECTIONS}}`를 관련 스펙 파일 참조로 교체
 - `{{CHECKLIST_ITEMS}}`를 배정된 체크리스트 항목 ID로 교체
 
-`/claude-sdd:build`에서 사용할 수 있도록 `docs/specs/wp-N-member.md`로 저장합니다.
+`/claude-sdd:sdd-build`에서 사용할 수 있도록 `docs/specs/wp-N-member.md`로 저장합니다.
 
 ### 출력 요약
 
@@ -87,7 +87,7 @@ description: Use when the user wants to decompose specs into work packages and a
 
 팀 멤버 설정: docs/specs/wp-*-member.md
 
-다음 단계: /claude-sdd:build — Agent Teams를 통한 구현 시작
+다음 단계: /claude-sdd:sdd-build — Agent Teams를 통한 구현 시작
 ```
 
 ## 출력
@@ -97,4 +97,4 @@ description: Use when the user wants to decompose specs into work packages and a
 
 ## 의존성
 
-- `docs/specs/02-*.md`부터 `06-*.md` (`/claude-sdd:spec`에서 생성)
+- `docs/specs/02-*.md`부터 `06-*.md` (`/claude-sdd:sdd-spec`에서 생성)

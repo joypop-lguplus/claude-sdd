@@ -1,17 +1,17 @@
 ---
-name: spec
+name: sdd-spec
 description: Use when the user wants to generate technical specifications and compliance checklists from requirements.
 ---
 
-# /claude-sdd:spec — 기술 명세서 생성
+# /claude-sdd:sdd-spec — 기술 명세서 생성
 
 요구사항을 상세한 기술 명세서와 스펙 준수 체크리스트로 변환합니다.
 
 ## 사용법
 
 ```
-/claude-sdd:spec              # 요구사항으로부터 모든 스펙 생성
-/claude-sdd:spec refresh      # 스펙 재생성 (기존 편집 내용은 주석으로 유지)
+/claude-sdd:sdd-spec              # 요구사항으로부터 모든 스펙 생성
+/claude-sdd:sdd-spec refresh      # 스펙 재생성 (기존 편집 내용은 주석으로 유지)
 ```
 
 ## 동작
@@ -20,7 +20,7 @@ description: Use when the user wants to generate technical specifications and co
 
 1. `docs/specs/sdd-config.yaml`을 읽어 프로젝트 유형(new/legacy)을 확인합니다.
 2. `docs/specs/01-requirements.md`를 읽어 모든 요구사항을 가져옵니다.
-3. 요구사항이 존재하지 않으면 안내합니다: `먼저 /claude-sdd:intake를 실행하여 요구사항을 수집하세요.`
+3. 요구사항이 존재하지 않으면 안내합니다: `먼저 /claude-sdd:sdd-intake를 실행하여 요구사항을 수집하세요.`
 
 ### 신규 프로젝트의 경우 (`type: new`)
 
@@ -101,7 +101,7 @@ description: Use when the user wants to generate technical specifications and co
   - 06-spec-checklist.md (M개 카테고리에 N개 항목)
 
 진행하기 전에 스펙을 검토하고 필요한 편집을 수행하세요.
-다음 단계: /claude-sdd:plan — 태스크 분해 및 팀 멤버 배정
+다음 단계: /claude-sdd:sdd-plan — 태스크 분해 및 팀 멤버 배정
 ```
 
 ## 출력
@@ -110,5 +110,5 @@ description: Use when the user wants to generate technical specifications and co
 
 ## 의존성
 
-- `docs/specs/01-requirements.md` (`/claude-sdd:intake`에서 생성)
-- `docs/specs/sdd-config.yaml` (`/claude-sdd:init`에서 생성)
+- `docs/specs/01-requirements.md` (`/claude-sdd:sdd-intake`에서 생성)
+- `docs/specs/sdd-config.yaml` (`/claude-sdd:sdd-init`에서 생성)

@@ -162,7 +162,7 @@ node <plugin-root>/scripts/sdd-lsp.mjs outgoing-calls <file> <line> <col>
 
 ## SDD 라이프사이클 통합
 
-### `/claude-sdd:spec` 단계 (레거시 프로젝트)
+### `/claude-sdd:sdd-spec` 단계 (레거시 프로젝트)
 
 명세 생성을 위해 레거시 코드베이스를 분석할 때:
 
@@ -170,7 +170,7 @@ node <plugin-root>/scripts/sdd-lsp.mjs outgoing-calls <file> <line> <col>
 2. **진단**을 실행하여 기존 문제를 식별합니다
 3. 심볼 테이블과 진단 요약을 스펙 작성자 에이전트에 제공합니다
 
-### `/claude-sdd:build` 단계 (구현)
+### `/claude-sdd:sdd-build` 단계 (구현)
 
 팀 멤버가 완료를 보고한 후:
 
@@ -178,7 +178,7 @@ node <plugin-root>/scripts/sdd-lsp.mjs outgoing-calls <file> <line> <col>
 2. **포맷 검증** 실행 — 포맷되지 않은 파일 표시
 3. 품질 루프 판단을 위해 팀 리더에게 결과를 보고합니다
 
-### `/claude-sdd:review` 단계 (품질 게이트)
+### `/claude-sdd:sdd-review` 단계 (품질 게이트)
 
 리뷰 프로세스의 일부로:
 

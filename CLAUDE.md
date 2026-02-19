@@ -29,17 +29,17 @@ node bin/cli.mjs version     # 버전 표시
 각 스킬은 Claude가 읽고 실행하는 절차적 지시사항이 담긴 `SKILL.md` 파일입니다. 라이프사이클 흐름:
 
 ```
-/claude-sdd:auto      → 단계 자동 감지 후 계속 진행
-/claude-sdd:init      → 프로젝트 설정 + SDD 디렉토리 초기화
-/claude-sdd:intake    → 요구사항 수집 (Confluence/Jira/Figma/파일/인터뷰)
-/claude-sdd:spec      → 기술 스펙 + 스펙 준수 체크리스트 생성
-/claude-sdd:plan      → 태스크 분해 → 워크 패키지 + 팀 할당
-/claude-sdd:build     → Agent Teams로 구현 + 품질 루프 (최대 3회 재작업 사이클)
-/claude-sdd:review    → 품질 게이트 검증 + 자동 진단
-/claude-sdd:integrate → PR 생성 + 문서화
-/claude-sdd:status    → 상태 대시보드
-/claude-sdd:lint      → 코드 분석 (진단, 검색, 심볼, 포맷)
-/claude-sdd:lsp       → LSP 기반 의미 분석 (진단, 정의, 참조, 심볼, 호출 계층)
+/claude-sdd:sdd-auto      → 단계 자동 감지 후 계속 진행
+/claude-sdd:sdd-init      → 프로젝트 설정 + SDD 디렉토리 초기화
+/claude-sdd:sdd-intake    → 요구사항 수집 (Confluence/Jira/Figma/파일/인터뷰)
+/claude-sdd:sdd-spec      → 기술 스펙 + 스펙 준수 체크리스트 생성
+/claude-sdd:sdd-plan      → 태스크 분해 → 워크 패키지 + 팀 할당
+/claude-sdd:sdd-build     → Agent Teams로 구현 + 품질 루프 (최대 3회 재작업 사이클)
+/claude-sdd:sdd-review    → 품질 게이트 검증 + 자동 진단
+/claude-sdd:sdd-integrate → PR 생성 + 문서화
+/claude-sdd:sdd-status    → 상태 대시보드
+/claude-sdd:sdd-lint      → 코드 분석 (진단, 검색, 심볼, 포맷)
+/claude-sdd:sdd-lsp       → LSP 기반 의미 분석 (진단, 정의, 참조, 심볼, 호출 계층)
 ```
 
 ### 에이전트 (`agents/` 내 5개)
@@ -50,11 +50,11 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 - **sdd-reviewer** -- 체크리스트 대비 스펙 준수 검증
 - **sdd-code-analyzer** -- 자동 진단, ast-grep, LSP, 포매팅 실행
 
-### 품질 루프 (`/claude-sdd:build`의 핵심 메커니즘)
+### 품질 루프 (`/claude-sdd:sdd-build`의 핵심 메커니즘)
 리더(Opus)가 팀 멤버(Sonnet, `sdd-implementer`)에게 워크 패키지를 할당합니다. 각 워크 패키지 완료 후 리더가 체크리스트를 검증합니다: 전부 `[x]` = 진행, `[ ]` 잔여 = 구체적 피드백과 함께 재작업, 3회 실패 = 사용자에게 에스컬레이션.
 
 ### 템플릿 (`templates/`)
-- `claude-md/` -- `/claude-sdd:build` 시 대상 프로젝트에 주입되는 CLAUDE.md 템플릿 (리더 vs 멤버 규칙)
+- `claude-md/` -- `/claude-sdd:sdd-build` 시 대상 프로젝트에 주입되는 CLAUDE.md 템플릿 (리더 vs 멤버 규칙)
 - `project-init/` -- 프로젝트 초기화용 `sdd-config.yaml.tmpl`
 - `specs/` -- 아키텍처, API, 데이터 모델 스펙 템플릿
 - `checklists/` -- 스펙 준수 및 품질 게이트 체크리스트 템플릿

@@ -1,19 +1,19 @@
 ---
-name: lint
+name: sdd-lint
 description: Use when the user wants to run code analysis — diagnostics, structural search, symbol extraction, or formatting.
 ---
 
-# /claude-sdd:lint — 코드 분석 및 진단
+# /claude-sdd:sdd-lint — 코드 분석 및 진단
 
 자동화된 코드 분석을 실행합니다: 진단, 구조 검색, 심볼 추출, 포맷팅.
 
 ## 사용법
 
 ```
-/claude-sdd:lint diagnostics [path]       # 프로젝트 진단 실행 (에러/경고)
-/claude-sdd:lint search <pattern> [path]  # ast-grep을 통한 구조 검색
-/claude-sdd:lint symbols [path]           # 함수/클래스/export 심볼 추출
-/claude-sdd:lint format [path]            # 코드 포맷팅 확인/수정
+/claude-sdd:sdd-lint diagnostics [path]       # 프로젝트 진단 실행 (에러/경고)
+/claude-sdd:sdd-lint search <pattern> [path]  # ast-grep을 통한 구조 검색
+/claude-sdd:sdd-lint symbols [path]           # 함수/클래스/export 심볼 추출
+/claude-sdd:sdd-lint format [path]            # 코드 포맷팅 확인/수정
 ```
 
 서브커맨드가 지정되지 않으면 기본적으로 `diagnostics`를 실행합니다.
@@ -70,7 +70,7 @@ bash <plugin-root>/scripts/sdd-detect-tools.sh <project-root>
 
 `[path]`가 제공되면 해당 경로로만 진단을 제한합니다.
 
-**LSP 향상:** Language Server가 설치되어 있으면 `/claude-sdd:lsp diagnostics`를 병행 실행하여 의미 수준 진단을 추가로 수집합니다. LSP 진단은 네이티브 도구가 놓칠 수 있는 타입 관련 오류를 포착합니다. 자세한 내용은 `/claude-sdd:lsp`을 참조하세요.
+**LSP 향상:** Language Server가 설치되어 있으면 `/claude-sdd:sdd-lsp diagnostics`를 병행 실행하여 의미 수준 진단을 추가로 수집합니다. LSP 진단은 네이티브 도구가 놓칠 수 있는 타입 관련 오류를 포착합니다. 자세한 내용은 `/claude-sdd:sdd-lsp`을 참조하세요.
 
 ### 서브커맨드: `search <pattern> [path]`
 
@@ -82,16 +82,16 @@ AST 기반 구조 코드 검색을 위해 ast-grep (`sg`)을 사용합니다.
 
 ```bash
 # 모든 export된 async 함수 찾기
-/claude-sdd:lint search "export async function $NAME($$$) { $$$ }"
+/claude-sdd:sdd-lint search "export async function $NAME($$$) { $$$ }"
 
 # React 컴포넌트 찾기
-/claude-sdd:lint search "function $COMP($$$): JSX.Element { $$$ }"
+/claude-sdd:sdd-lint search "function $COMP($$$): JSX.Element { $$$ }"
 
 # 특정 함수 호출 찾기
-/claude-sdd:lint search "fetch($URL, $$$)"
+/claude-sdd:sdd-lint search "fetch($URL, $$$)"
 
 # 클래스 메서드 찾기
-/claude-sdd:lint search "class $NAME { $$$ async $METHOD($$$) { $$$ } $$$ }"
+/claude-sdd:sdd-lint search "class $NAME { $$$ async $METHOD($$$) { $$$ } $$$ }"
 ```
 
 `$NAME`, `$$$` 등은 ast-grep 메타변수입니다:
@@ -136,11 +136,11 @@ AST 기반 구조 코드 검색을 위해 ast-grep (`sg`)을 사용합니다.
 전체: 6개 심볼 (5개 export, 1개 internal)
 ```
 
-**LSP 향상:** Language Server가 설치되어 있으면 `/claude-sdd:lsp symbols`를 병행 실행하여 더 정확한 심볼 테이블을 제공합니다. LSP는 타입 정보와 계층 관계를 포함합니다.
+**LSP 향상:** Language Server가 설치되어 있으면 `/claude-sdd:sdd-lsp symbols`를 병행 실행하여 더 정확한 심볼 테이블을 제공합니다. LSP는 타입 정보와 계층 관계를 포함합니다.
 
 활용 사례:
-- `/claude-sdd:spec` 시 레거시 프로젝트의 코드베이스 구조 파악
-- `/claude-sdd:review` 시 예상 exports 존재 여부 확인
+- `/claude-sdd:sdd-spec` 시 레거시 프로젝트의 코드베이스 구조 파악
+- `/claude-sdd:sdd-review` 시 예상 exports 존재 여부 확인
 - 스펙 항목을 실제 코드 위치에 매핑
 
 ### 서브커맨드: `format [path]`
@@ -171,31 +171,31 @@ AST 기반 구조 코드 검색을 위해 ast-grep (`sg`)을 사용합니다.
   src/user/model.ts
   src/utils/helpers.ts
 
-이 파일들을 자동 포맷하려면 "/claude-sdd:lint format --fix"를 실행하세요.
+이 파일들을 자동 포맷하려면 "/claude-sdd:sdd-lint format --fix"를 실행하세요.
 ```
 
 사용자가 명시적으로 `--fix`를 전달하면, 쓰기 모드로 포매터를 실행하여 파일을 자동 포맷합니다.
 
 ## SDD 라이프사이클과의 통합
 
-### `/claude-sdd:build`와 함께
+### `/claude-sdd:sdd-build`와 함께
 
 워크 패키지를 완료로 표시하기 전에 팀 멤버는 다음을 수행해야 합니다:
-1. `/claude-sdd:lint diagnostics` 실행 — 모든 에러 수정
-2. `/claude-sdd:lint format --fix` 실행 — 코드 자동 포맷
+1. `/claude-sdd:sdd-lint diagnostics` 실행 — 모든 에러 수정
+2. `/claude-sdd:sdd-lint format --fix` 실행 — 코드 자동 포맷
 
-### `/claude-sdd:review`와 함께
+### `/claude-sdd:sdd-review`와 함께
 
 리뷰 프로세스에는 자동으로 다음이 포함됩니다:
 1. 진단 검사 (PASS를 위해 에러 0건 필요)
 2. 포맷 검증 (파일에 포맷팅이 필요하면 경고)
 3. 리뷰 리포트의 "자동화된 검사" 섹션에 결과 포함
 
-### `/claude-sdd:spec`와 함께 (레거시 프로젝트)
+### `/claude-sdd:sdd-spec`와 함께 (레거시 프로젝트)
 
 스펙 생성을 위해 기존 코드를 분석할 때:
-1. `/claude-sdd:lint symbols` 실행으로 코드 구조 파악
-2. `/claude-sdd:lint diagnostics` 실행으로 기존 기술 부채 식별
+1. `/claude-sdd:sdd-lint symbols` 실행으로 코드 구조 파악
+2. `/claude-sdd:sdd-lint diagnostics` 실행으로 기존 기술 부채 식별
 
 ## 에이전트
 

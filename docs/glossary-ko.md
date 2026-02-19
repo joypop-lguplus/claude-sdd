@@ -118,7 +118,7 @@
 
 ## 번역 시 주의사항
 
-1. **명령어 이름**: `/claude-sdd:build`, `/claude-sdd:review` 등은 항상 영어로 유지
+1. **명령어 이름**: `/claude-sdd:sdd-build`, `/claude-sdd:sdd-review` 등은 항상 영어로 유지
 2. **파일 경로**: `docs/specs/06-spec-checklist.md` 등은 영어로 유지
 3. **체크리스트 접두사**: `ARCH`, `API`, `DM`, `COMP`, `TEST`, `SEC`, `PERF`, `UI`는 영어 유지
 4. **템플릿 변수**: `{{PROJECT_NAME}}`, `{{TIMESTAMP}}` 등은 그대로 유지

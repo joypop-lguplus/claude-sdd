@@ -15,13 +15,13 @@ A Claude Code plugin that manages the full development lifecycle through **Spec-
 ## The SDD Lifecycle
 
 ```
-/claude-sdd:init  -->  /claude-sdd:intake  -->  /claude-sdd:spec  -->  /claude-sdd:plan
+/claude-sdd:sdd-init  -->  /claude-sdd:sdd-intake  -->  /claude-sdd:sdd-spec  -->  /claude-sdd:sdd-plan
    |                      |                        |                      |
    v                      v                        v                      v
  Project              Requirements              Technical              Task
  Setup                Gathering                 Specs                  Decomposition
 
-/claude-sdd:build  -->  /claude-sdd:review  -->  /claude-sdd:integrate
+/claude-sdd:sdd-build  -->  /claude-sdd:sdd-review  -->  /claude-sdd:sdd-integrate
    |                |                 |
    v                v                 v
  Agent Teams     Quality           PR &
@@ -32,15 +32,15 @@ A Claude Code plugin that manages the full development lifecycle through **Spec-
 
 | Phase | Command | Output |
 |-------|---------|--------|
-| 1. Init | `/claude-sdd:init new\|legacy` | `sdd-config.yaml`, CLAUDE.md rules |
-| 2. Intake | `/claude-sdd:intake` | `01-requirements.md` |
-| 3. Spec | `/claude-sdd:spec` | `02-*.md` through `06-spec-checklist.md` |
-| 4. Plan | `/claude-sdd:plan` | `07-task-plan.md`, work packages |
-| 5. Build | `/claude-sdd:build` | Implementation + tests |
-| 6. Review | `/claude-sdd:review` | `08-review-report.md` |
-| 7. Integrate | `/claude-sdd:integrate` | PR with spec traceability |
+| 1. Init | `/claude-sdd:sdd-init new\|legacy` | `sdd-config.yaml`, CLAUDE.md rules |
+| 2. Intake | `/claude-sdd:sdd-intake` | `01-requirements.md` |
+| 3. Spec | `/claude-sdd:sdd-spec` | `02-*.md` through `06-spec-checklist.md` |
+| 4. Plan | `/claude-sdd:sdd-plan` | `07-task-plan.md`, work packages |
+| 5. Build | `/claude-sdd:sdd-build` | Implementation + tests |
+| 6. Review | `/claude-sdd:sdd-review` | `08-review-report.md` |
+| 7. Integrate | `/claude-sdd:sdd-integrate` | PR with spec traceability |
 
-Use `/claude-sdd:auto` to auto-detect the current phase and continue.
+Use `/claude-sdd:sdd-auto` to auto-detect the current phase and continue.
 
 ## Installation
 
@@ -72,17 +72,17 @@ claude --plugin-dir .
 
 | Command | Description |
 |---------|-------------|
-| `/claude-sdd:auto` | Auto-detect phase and continue lifecycle |
-| `/claude-sdd:init` | Initialize project for SDD |
-| `/claude-sdd:intake` | Gather requirements (Confluence, Jira, Figma, file, interview) |
-| `/claude-sdd:spec` | Generate technical specifications |
-| `/claude-sdd:plan` | Decompose tasks and assign to Agent Teams |
-| `/claude-sdd:build` | Implementation with quality loop |
-| `/claude-sdd:review` | Quality gate verification |
-| `/claude-sdd:integrate` | Integration, PR creation, documentation |
-| `/claude-sdd:status` | Status dashboard with progress tracking |
-| `/claude-sdd:lint` | Code analysis: diagnostics, search, symbols, format |
-| `/claude-sdd:lsp` | LSP-based semantic analysis: diagnostics, definitions, references, symbols, call hierarchy |
+| `/claude-sdd:sdd-auto` | Auto-detect phase and continue lifecycle |
+| `/claude-sdd:sdd-init` | Initialize project for SDD |
+| `/claude-sdd:sdd-intake` | Gather requirements (Confluence, Jira, Figma, file, interview) |
+| `/claude-sdd:sdd-spec` | Generate technical specifications |
+| `/claude-sdd:sdd-plan` | Decompose tasks and assign to Agent Teams |
+| `/claude-sdd:sdd-build` | Implementation with quality loop |
+| `/claude-sdd:sdd-review` | Quality gate verification |
+| `/claude-sdd:sdd-integrate` | Integration, PR creation, documentation |
+| `/claude-sdd:sdd-status` | Status dashboard with progress tracking |
+| `/claude-sdd:sdd-lint` | Code analysis: diagnostics, search, symbols, format |
+| `/claude-sdd:sdd-lsp` | LSP-based semantic analysis: diagnostics, definitions, references, symbols, call hierarchy |
 
 ### Agents
 
@@ -117,10 +117,10 @@ Leader: Verifies checklist
 | Node.js 18+ | **Yes** | For CLI tools |
 | Agent Teams | **Yes** | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
 | `gh` CLI | Recommended | For PR creation |
-| ast-grep (`sg`) | Optional | For `/claude-sdd:lint search` and `/claude-sdd:lint symbols` |
-| Language Server | Optional | For `/claude-sdd:lsp` semantic analysis (per-language) |
-| Confluence MCP | Optional | For `/claude-sdd:intake confluence:...` |
-| Jira MCP | Optional | For `/claude-sdd:intake jira:...` |
+| ast-grep (`sg`) | Optional | For `/claude-sdd:sdd-lint search` and `/claude-sdd:sdd-lint symbols` |
+| Language Server | Optional | For `/claude-sdd:sdd-lsp` semantic analysis (per-language) |
+| Confluence MCP | Optional | For `/claude-sdd:sdd-intake confluence:...` |
+| Jira MCP | Optional | For `/claude-sdd:sdd-intake jira:...` |
 
 ### Enabling Agent Teams
 
