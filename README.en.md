@@ -1,5 +1,7 @@
 # claude-sdd — Spec-Driven Development Lifecycle
 
+> [한국어](README.md)
+
 A Claude Code plugin that manages the full development lifecycle through **Spec-Driven Development (SDD)** methodology, powered by **Agent Teams** for parallel implementation.
 
 ## Why SDD?
@@ -39,6 +41,7 @@ A Claude Code plugin that manages the full development lifecycle through **Spec-
 | 5. Build | `/claude-sdd:sdd-build` | Implementation + tests |
 | 6. Review | `/claude-sdd:sdd-review` | `08-review-report.md` |
 | 7. Integrate | `/claude-sdd:sdd-integrate` | PR with spec traceability |
+| 8. Change | `/claude-sdd:sdd-change` | Impact analysis + delta build + regression verification |
 
 Use `/claude-sdd:sdd-auto` to auto-detect the current phase and continue.
 
@@ -73,13 +76,15 @@ claude --plugin-dir .
 | Command | Description |
 |---------|-------------|
 | `/claude-sdd:sdd-auto` | Auto-detect phase and continue lifecycle |
+| `/claude-sdd:sdd-kickstart` | Deep interview + full pipeline auto-execution |
 | `/claude-sdd:sdd-init` | Initialize project for SDD |
 | `/claude-sdd:sdd-intake` | Gather requirements (Confluence, Jira, Figma, file, interview) |
 | `/claude-sdd:sdd-spec` | Generate technical specifications |
 | `/claude-sdd:sdd-plan` | Decompose tasks and assign to Agent Teams |
-| `/claude-sdd:sdd-build` | Implementation with quality loop |
+| `/claude-sdd:sdd-build` | Implementation with quality loop (`--tdd` for TDD mode) |
 | `/claude-sdd:sdd-review` | Quality gate verification |
 | `/claude-sdd:sdd-integrate` | Integration, PR creation, documentation |
+| `/claude-sdd:sdd-change` | Change management: impact analysis, checklist update, TDD delta build |
 | `/claude-sdd:sdd-status` | Status dashboard with progress tracking |
 | `/claude-sdd:sdd-lint` | Code analysis: diagnostics, search, symbols, format |
 | `/claude-sdd:sdd-lsp` | LSP-based semantic analysis: diagnostics, definitions, references, symbols, call hierarchy |
@@ -90,9 +95,11 @@ claude --plugin-dir .
 |-------|------|
 | `sdd-requirements-analyst` | Extracts requirements from Confluence/Jira/Figma |
 | `sdd-spec-writer` | Generates technical specs and checklists |
-| `sdd-implementer` | Implements work packages (Agent Teams member) |
-| `sdd-reviewer` | Verifies implementation against spec checklist |
+| `sdd-implementer` | Implements work packages (Agent Teams member, TDD mode supported) |
+| `sdd-reviewer` | Verifies implementation against spec checklist (TDD compliance check) |
 | `sdd-code-analyzer` | Automated code analysis with native tools, ast-grep, and LSP |
+| `sdd-test-writer` | TDD test writer: generates failing tests from specs (no implementation) |
+| `sdd-change-analyst` | Change impact analysis: LSP/code analysis, minimal impact principle |
 
 ### The Quality Loop
 
@@ -107,6 +114,31 @@ Leader: Verifies checklist
   |-- [ ] items remain --> Specific feedback + rework (max 3 cycles)
   |-- All [x] --> Next work package
   |-- 3 failures --> Escalate to user
+```
+
+### TDD Mode (`--tdd`)
+
+Enable with `/claude-sdd:sdd-build --tdd` or `teams.tdd: true` in `sdd-config.yaml`:
+
+```
+Phase A (Red):   sdd-test-writer generates failing tests from specs
+Phase B (Green): sdd-implementer writes code to pass tests (no test modification)
+Phase C (Verify): Leader runs full test suite, confirms all pass
+Rework: On failure, repeat Phase B+C (max 3 cycles)
+```
+
+### Change Management (`/claude-sdd:sdd-change`)
+
+After integration, handle change requests through a 7-phase workflow:
+
+```
+Phase 1: Collect change request → 09-change-request.md
+Phase 2: Impact analysis (sdd-change-analyst) → spec deltas
+Phase 3: Partial checklist update (minimal impact principle)
+Phase 4: Delta task plan (CWP-1, CWP-2...)
+Phase 5: TDD delta build (CHG- + CHG-REG- tests)
+Phase 6: Review + regression verification
+Phase 7: PR creation (with change traceability)
 ```
 
 ## Requirements
@@ -150,9 +182,12 @@ claude-sdd/
 │   ├── sdd-spec-writer.md
 │   ├── sdd-implementer.md
 │   ├── sdd-reviewer.md
-│   └── sdd-code-analyzer.md
+│   ├── sdd-code-analyzer.md
+│   ├── sdd-test-writer.md
+│   └── sdd-change-analyst.md
 ├── skills/
-│   ├── sdd/SKILL.md
+│   ├── sdd-auto/SKILL.md
+│   ├── sdd-kickstart/SKILL.md
 │   ├── sdd-init/SKILL.md
 │   ├── sdd-intake/SKILL.md
 │   ├── sdd-spec/SKILL.md
@@ -160,6 +195,7 @@ claude-sdd/
 │   ├── sdd-build/SKILL.md
 │   ├── sdd-review/SKILL.md
 │   ├── sdd-integrate/SKILL.md
+│   ├── sdd-change/SKILL.md
 │   ├── sdd-status/SKILL.md
 │   ├── sdd-lint/SKILL.md
 │   └── sdd-lsp/SKILL.md

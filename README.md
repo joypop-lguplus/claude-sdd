@@ -1,11 +1,240 @@
-# claude-sdd
+# claude-sdd — 스펙 주도 개발 (SDD) 라이프사이클
 
-[한국어](README.ko.md) | [English](README.en.md)
+> [English](README.en.md)
 
----
+**스펙 주도 개발(SDD)** 방법론을 통해 전체 개발 라이프사이클을 관리하는 Claude Code 플러그인입니다. **Agent Teams**를 활용한 병렬 구현을 지원합니다.
 
-Claude Code 플러그인 — 스펙 주도 개발(SDD) 라이프사이클
-A Claude Code plugin for Spec-Driven Development (SDD) lifecycle.
+## 왜 SDD인가?
 
-원하는 언어로 전체 문서를 확인하세요.
-See the full documentation in your preferred language.
+| 문제 | SDD 해결 방안 |
+|------|--------------|
+| 모호한 요구사항이 재작업을 유발 | Confluence, Jira, Figma, 인터뷰를 통한 구조화된 요구사항 수집 |
+| 단일 정보 소스 부재 | 스펙 문서 + 준수 체크리스트를 git으로 관리 |
+| 팀원 간 품질 편차 | 스펙 검증을 통한 자동화된 품질 게이트 |
+| 진행 상황 파악 어려움 | 체크리스트 기반 진행률 추적 (0%~100%) |
+| 순차 처리로 인한 병목 | Agent Teams의 워크 패키지 병렬 실행 |
+
+## SDD 라이프사이클
+
+```
+/claude-sdd:sdd-init  -->  /claude-sdd:sdd-intake  -->  /claude-sdd:sdd-spec  -->  /claude-sdd:sdd-plan
+   |                      |                        |                      |
+   v                      v                        v                      v
+ 프로젝트             요구사항                  기술 스펙              태스크
+ 설정                 수집                      작성                   분해
+
+/claude-sdd:sdd-build  -->  /claude-sdd:sdd-review  -->  /claude-sdd:sdd-integrate
+   |                |                 |
+   v                v                 v
+ Agent Teams     품질               PR &
+ 구현            게이트             문서화
+```
+
+### 7단계
+
+| 단계 | 명령어 | 산출물 |
+|------|--------|--------|
+| 1. 초기화 | `/claude-sdd:sdd-init new\|legacy` | `sdd-config.yaml`, CLAUDE.md 규칙 |
+| 2. 요구사항 수집 | `/claude-sdd:sdd-intake` | `01-requirements.md` |
+| 3. 스펙 작성 | `/claude-sdd:sdd-spec` | `02-*.md` ~ `06-spec-checklist.md` |
+| 4. 계획 수립 | `/claude-sdd:sdd-plan` | `07-task-plan.md`, 워크 패키지 |
+| 5. 구현 | `/claude-sdd:sdd-build` | 구현 코드 + 테스트 |
+| 6. 리뷰 | `/claude-sdd:sdd-review` | `08-review-report.md` |
+| 7. 통합 | `/claude-sdd:sdd-integrate` | 스펙 추적 가능한 PR |
+| 8. 변경 | `/claude-sdd:sdd-change` | 변경 영향 분석 + 델타 빌드 + 회귀 검증 |
+
+`/claude-sdd:sdd-auto`를 사용하면 현재 단계를 자동 감지하고 이어서 진행합니다.
+
+## 설치
+
+### 빠른 시작 (npx)
+
+```bash
+npx github:joypop-lguplus/claude-sdd install
+```
+
+### CLI 명령어
+
+```bash
+npx github:joypop-lguplus/claude-sdd check    # 상태 확인
+npx github:joypop-lguplus/claude-sdd install   # 대화형 설치 마법사
+npx github:joypop-lguplus/claude-sdd doctor    # 정밀 진단
+```
+
+### 수동 설치 / 로컬 개발
+
+```bash
+git clone https://github.com/joypop-lguplus/claude-sdd.git
+cd claude-sdd
+claude --plugin-dir .
+```
+
+## 구성 요소
+
+### 스킬 (슬래시 명령어)
+
+| 명령어 | 설명 |
+|--------|------|
+| `/claude-sdd:sdd-auto` | 현재 단계를 자동 감지하고 라이프사이클 진행 |
+| `/claude-sdd:sdd-kickstart` | 심층 인터뷰 + 전체 파이프라인 자동 실행 |
+| `/claude-sdd:sdd-init` | SDD 프로젝트 초기화 |
+| `/claude-sdd:sdd-intake` | 요구사항 수집 (Confluence, Jira, Figma, 파일, 인터뷰) |
+| `/claude-sdd:sdd-spec` | 기술 스펙 생성 |
+| `/claude-sdd:sdd-plan` | 태스크 분해 및 Agent Teams 할당 |
+| `/claude-sdd:sdd-build` | 품질 루프를 통한 구현 (`--tdd`로 TDD 모드 지원) |
+| `/claude-sdd:sdd-review` | 품질 게이트 검증 |
+| `/claude-sdd:sdd-integrate` | 통합, PR 생성, 문서화 |
+| `/claude-sdd:sdd-change` | 변경 관리: 영향 분석, 체크리스트 갱신, TDD 델타 빌드 |
+| `/claude-sdd:sdd-status` | 진행 상황 대시보드 |
+| `/claude-sdd:sdd-lint` | 코드 분석: 진단, 검색, 심볼, 포맷 |
+| `/claude-sdd:sdd-lsp` | LSP 기반 의미 분석: 진단, 정의, 참조, 심볼, 호출 계층 |
+
+### 에이전트
+
+| 에이전트 | 역할 |
+|----------|------|
+| `sdd-requirements-analyst` | Confluence/Jira/Figma에서 요구사항 추출 |
+| `sdd-spec-writer` | 기술 스펙 및 체크리스트 생성 |
+| `sdd-implementer` | 워크 패키지 구현 (Agent Teams 멤버, TDD 모드 지원) |
+| `sdd-reviewer` | 스펙 체크리스트 대비 구현 검증 (TDD 준수 확인 포함) |
+| `sdd-code-analyzer` | 네이티브 도구, ast-grep, LSP를 활용한 자동 코드 분석 |
+| `sdd-test-writer` | TDD 테스트 작성 (스펙 기반 실패 테스트, 구현 금지) |
+| `sdd-change-analyst` | 변경 영향 분석 (LSP/코드 분석, 최소 영향 원칙) |
+
+### 품질 루프
+
+SDD의 핵심은 빌드 단계에서의 리더 주도 품질 루프입니다:
+
+```
+리더 (Opus): 스펙 참조와 함께 워크 패키지 할당
+  |
+팀 멤버 (Sonnet): 스펙 확인 --> 구현 --> 테스트 --> 보고
+  |
+리더: 체크리스트 검증
+  |-- [ ] 미완료 항목 존재 --> 구체적 피드백 + 재작업 (최대 3회)
+  |-- 모두 [x] --> 다음 워크 패키지
+  |-- 3회 실패 --> 사용자에게 에스컬레이션
+```
+
+### TDD 모드 (`--tdd`)
+
+`/claude-sdd:sdd-build --tdd` 또는 `sdd-config.yaml`의 `teams.tdd: true`로 활성화합니다:
+
+```
+Phase A (Red):   sdd-test-writer가 스펙 기반 실패 테스트 작성
+Phase B (Green): sdd-implementer가 테스트 통과 코드 작성 (테스트 수정 금지)
+Phase C (Verify): 리더가 전체 테스트 실행, 통과 확인
+재작업: 실패 시 Phase B+C 반복 (최대 3회)
+```
+
+### 변경 관리 (`/claude-sdd:sdd-change`)
+
+통합 완료 후 변경 요청을 7 Phase로 처리합니다:
+
+```
+Phase 1: 변경 요청 수집 → 09-change-request.md
+Phase 2: 영향 분석 (sdd-change-analyst) → 스펙 델타
+Phase 3: 체크리스트 부분 갱신 (최소 영향 원칙)
+Phase 4: 델타 태스크 계획 (CWP-1, CWP-2...)
+Phase 5: TDD 델타 빌드 (CHG- + CHG-REG- 테스트)
+Phase 6: 리뷰 + 회귀 검증
+Phase 7: PR 생성 (변경 추적성 포함)
+```
+
+## 요구사항
+
+| 구성 요소 | 필수 여부 | 비고 |
+|-----------|----------|------|
+| Claude Code | **필수** | 플러그인 호스트 |
+| Node.js 18+ | **필수** | CLI 도구용 |
+| Agent Teams | **필수** | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
+| `gh` CLI | 권장 | PR 생성용 |
+| ast-grep (`sg`) | 선택 | `/claude-sdd:sdd-lint search` 및 `/claude-sdd:sdd-lint symbols`용 |
+| Language Server | 선택 | `/claude-sdd:sdd-lsp` 의미 분석용 (언어별 서버) |
+| Confluence MCP | 선택 | `/claude-sdd:sdd-intake confluence:...`용 |
+| Jira MCP | 선택 | `/claude-sdd:sdd-intake jira:...`용 |
+
+### Agent Teams 활성화
+
+```json
+// ~/.claude/settings.json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+## 문서
+
+- [아키텍처](docs/architecture.md) -- 플러그인 구조 및 설계
+- [설치 가이드](docs/setup-guide.md) -- 단계별 설치 방법
+- [사용 가이드](docs/usage-guide.md) -- 상세 사용 예시
+- [상황별 워크플로우 가이드](docs/workflow-guide.md) -- 시나리오별 최적 워크플로우
+- [SDD 방법론](docs/sdd-methodology.md) -- SDD 접근법 설명
+- [용어 사전](docs/glossary-ko.md) -- SDD 용어 정리
+
+## 플러그인 구조
+
+```
+claude-sdd/
+├── .claude-plugin/plugin.json
+├── agents/
+│   ├── sdd-requirements-analyst.md
+│   ├── sdd-spec-writer.md
+│   ├── sdd-implementer.md
+│   ├── sdd-reviewer.md
+│   ├── sdd-code-analyzer.md
+│   ├── sdd-test-writer.md
+│   └── sdd-change-analyst.md
+├── skills/
+│   ├── sdd-auto/SKILL.md
+│   ├── sdd-kickstart/SKILL.md
+│   ├── sdd-init/SKILL.md
+│   ├── sdd-intake/SKILL.md
+│   ├── sdd-spec/SKILL.md
+│   ├── sdd-plan/SKILL.md
+│   ├── sdd-build/SKILL.md
+│   ├── sdd-review/SKILL.md
+│   ├── sdd-integrate/SKILL.md
+│   ├── sdd-change/SKILL.md
+│   ├── sdd-status/SKILL.md
+│   ├── sdd-lint/SKILL.md
+│   └── sdd-lsp/SKILL.md
+├── templates/
+│   ├── claude-md/
+│   ├── specs/
+│   ├── checklists/
+│   └── project-init/
+├── scripts/
+│   ├── sdd-session-init.sh
+│   ├── sdd-detect-tools.sh
+│   └── sdd-lsp.mjs
+├── bin/cli.mjs
+├── lib/
+│   ├── utils.mjs
+│   ├── checker.mjs
+│   ├── installer.mjs
+│   ├── doctor.mjs
+│   └── lsp/
+│       ├── client.mjs
+│       ├── servers.mjs
+│       └── bridge.mjs
+├── docs/
+│   ├── architecture.md
+│   ├── setup-guide.md
+│   ├── usage-guide.md
+│   ├── workflow-guide.md
+│   └── sdd-methodology.md
+├── hooks/hooks.json
+├── .mcp.json
+├── package.json
+├── marketplace.json
+├── README.md
+├── LICENSE
+└── CHANGELOG.md
+```
+
+## 라이선스
+
+MIT
