@@ -23,6 +23,13 @@ async function main() {
       break;
     }
 
+    case 'uninstall': {
+      header('claude-sdd \u2014 제거');
+      const { runUninstaller } = await import('../lib/installer.mjs');
+      await runUninstaller();
+      break;
+    }
+
     case 'doctor': {
       header('claude-sdd \u2014 진단');
       const { runDoctor } = await import('../lib/doctor.mjs');
@@ -60,6 +67,7 @@ function printHelp() {
   console.log();
   console.log(colors.bold('명령어:'));
   console.log('  install     설치 마법사 실행');
+  console.log('  uninstall   플러그인 제거');
   console.log('  check       의존성 상태 확인');
   console.log('  doctor      정밀 진단');
   console.log('  version     버전 표시');
@@ -77,6 +85,7 @@ function printHelp() {
   console.log('  /sdd-review     품질 게이트 검증');
   console.log('  /sdd-integrate  통합, PR 및 문서화');
   console.log('  /sdd-status     상태 대시보드');
+  console.log('  /sdd-lsp        LSP 기반 의미 분석');
   console.log('  /sdd            단계 자동 감지 및 진행');
 }
 
