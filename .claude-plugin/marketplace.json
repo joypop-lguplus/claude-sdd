@@ -1,0 +1,31 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-sdd",
+  "description": "Spec-Driven Development lifecycle with Claude Code Agent Teams",
+  "owner": {
+    "name": "joypop",
+    "email": "joypop@example.com"
+  },
+  "plugins": [
+    {
+      "name": "claude-sdd",
+      "description": "Spec-Driven Development lifecycle — 7-phase software project lifecycle with Agent Teams. Requirements, specs, planning, implementation, review, and integration.",
+      "version": "0.3.0",
+      "author": {
+        "name": "joypop"
+      },
+      "source": "./",
+      "category": "developer-tools",
+      "homepage": "https://github.com/joypop-lguplus/claude-sdd",
+      "tags": [
+        "sdd",
+        "spec-driven-development",
+        "agent-teams",
+        "lifecycle",
+        "code-analysis",
+        "lsp"
+      ]
+    }
+  ],
+  "version": "0.3.0"
+}
