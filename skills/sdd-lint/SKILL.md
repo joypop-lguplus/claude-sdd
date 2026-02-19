@@ -17,6 +17,7 @@
 
 - 프로젝트에 고유 진단 도구가 설치되어 있어야 함 (tsc, ruff, cargo 등)
 - ast-grep (`sg`)은 선택 사항이지만 `search` 및 `symbols`에 권장
+- Language Server는 선택 사항이지만 `diagnostics` 및 `symbols`를 LSP 기반으로 향상
 
 ## 동작
 
@@ -63,6 +64,8 @@ bash <plugin-root>/scripts/sdd-detect-tools.sh <project-root>
 ```
 
 `[path]`가 제공되면 해당 경로로만 진단을 제한합니다.
+
+**LSP 향상:** Language Server가 설치되어 있으면 `/sdd-lsp diagnostics`를 병행 실행하여 의미 수준 진단을 추가로 수집합니다. LSP 진단은 네이티브 도구가 놓칠 수 있는 타입 관련 오류를 포착합니다. 자세한 내용은 `/sdd-lsp`을 참조하세요.
 
 ### 서브커맨드: `search <pattern> [path]`
 
@@ -127,6 +130,8 @@ AST 기반 구조 코드 검색을 위해 ast-grep (`sg`)을 사용합니다.
 
 전체: 6개 심볼 (5개 export, 1개 internal)
 ```
+
+**LSP 향상:** Language Server가 설치되어 있으면 `/sdd-lsp symbols`를 병행 실행하여 더 정확한 심볼 테이블을 제공합니다. LSP는 타입 정보와 계층 관계를 포함합니다.
 
 활용 사례:
 - `/sdd-spec` 시 레거시 프로젝트의 코드베이스 구조 파악
@@ -195,4 +200,5 @@ AST 기반 구조 코드 검색을 위해 ast-grep (`sg`)을 사용합니다.
 
 - 프로젝트 언어에 맞는 고유 진단/포매터 도구
 - ast-grep (`sg`) — 선택 사항, `search` 및 `symbols` 서브커맨드 향상
+- Language Server — 선택 사항, `diagnostics` 및 `symbols`에 LSP 기반 의미 분석 추가
 - `scripts/sdd-detect-tools.sh` — 도구 자동 감지

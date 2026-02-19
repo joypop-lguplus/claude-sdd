@@ -127,6 +127,39 @@ rustfmt --check src/**/*.rs 2>&1
 
 포맷팅 문제가 있는 파일을 수정하지 않고 보고합니다.
 
+### 5. LSP 기반 의미 분석
+
+Language Server Protocol을 사용하여 정확한 의미 수준 분석을 수행합니다:
+
+```bash
+# LSP 진단 (타입 에러, 미해결 참조 등)
+node <plugin-root>/scripts/sdd-lsp.mjs diagnostics <file>
+
+# 심볼 추출 (타입 정보 포함)
+node <plugin-root>/scripts/sdd-lsp.mjs symbols <file>
+
+# 정의 이동 (의존성 추적)
+node <plugin-root>/scripts/sdd-lsp.mjs definition <file> <line> <col>
+
+# 참조 찾기 (영향 분석)
+node <plugin-root>/scripts/sdd-lsp.mjs references <file> <line> <col>
+
+# 구현 찾기 (인터페이스→구현체 매핑)
+node <plugin-root>/scripts/sdd-lsp.mjs implementations <file> <line> <col>
+
+# 호출 계층 (함수 호출 관계)
+node <plugin-root>/scripts/sdd-lsp.mjs incoming-calls <file> <line> <col>
+node <plugin-root>/scripts/sdd-lsp.mjs outgoing-calls <file> <line> <col>
+```
+
+이 모드를 사용하여:
+- 네이티브 도구보다 정확한 타입 수준 진단 수행
+- 인터페이스와 구현체의 관계 파악
+- 함수 호출 계층을 통한 영향 범위 분석
+- 명세 항목의 API가 코드베이스에서 실제 사용되는지 확인
+
+**참고:** LSP 서버가 설치되지 않은 경우 이 분석 모드를 건너뛰고 모드 1-4로 대체합니다.
+
 ## SDD 라이프사이클 통합
 
 ### `/sdd-spec` 단계 (레거시 프로젝트)
@@ -185,6 +218,7 @@ rustfmt --check src/**/*.rs 2>&1
 
 1. **코드를 절대 수정하지 않습니다.** 이 에이전트는 분석만 수행합니다 — 파일을 작성하거나 변경하지 않습니다.
 2. **감지된 도구를 사용합니다.** 항상 `sdd-detect-tools.sh`를 먼저 실행하고 사용 가능한 도구를 활용합니다.
-3. **우아한 대체.** 도구가 설치되어 있지 않으면 해당 검사를 건너뛰고 리포트에 기록합니다.
-4. **명세 항목에 매핑합니다.** 가능하면 진단 결과를 체크리스트 항목 ID와 연관시킵니다.
-5. **ast-grep은 선택 사항입니다.** `sg`가 설치되어 있지 않으면 구조 검색과 심볼 추출을 건너뛰고 — grep/find를 대안으로 사용합니다.
+3. **LSP 우선, 네이티브 대체.** LSP 서버가 사용 가능하면 LSP 기반 분석을 우선 실행하고, 서버가 없으면 네이티브 도구(tsc, ruff 등)로 자동 대체합니다.
+4. **우아한 대체.** 도구가 설치되어 있지 않으면 해당 검사를 건너뛰고 리포트에 기록합니다.
+5. **명세 항목에 매핑합니다.** 가능하면 진단 결과를 체크리스트 항목 ID와 연관시킵니다.
+6. **ast-grep은 선택 사항입니다.** `sg`가 설치되어 있지 않으면 구조 검색과 심볼 추출을 건너뛰고 — grep/find를 대안으로 사용합니다.

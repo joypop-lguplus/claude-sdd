@@ -8,6 +8,7 @@
 | Node.js | 18+ | 필수 |
 | Agent Teams | 활성화 | 필수 |
 | `gh` CLI | 최신 | 권장 |
+| Language Server | - | 선택 |
 | Confluence MCP | - | 선택 |
 | Jira MCP | - | 선택 |
 
@@ -79,7 +80,32 @@ claude mcp add mcp-atlassian -s user -- \
 
 참고: `mcp-atlassian` 패키지는 하나의 MCP 서버에서 Confluence와 Jira를 모두 지원합니다.
 
-## 4단계: 설치 확인
+## 4단계: Language Server 설치 (선택)
+
+`/sdd-lsp` 의미 분석을 사용하려면 프로젝트 언어에 맞는 Language Server를 설치합니다:
+
+```bash
+# TypeScript/JavaScript
+npm i -g typescript-language-server typescript
+
+# Python
+npm i -g pyright
+# 또는: pip install pyright
+
+# Go
+go install golang.org/x/tools/gopls@latest
+
+# Rust
+rustup component add rust-analyzer
+
+# C/C++
+# macOS: brew install llvm
+# Ubuntu: apt install clangd
+```
+
+Language Server 없이도 SDD를 사용할 수 있습니다. `/sdd-lint`가 네이티브 도구로 대체합니다.
+
+## 5단계: 설치 확인
 
 ```bash
 # 의존성 상태 확인
@@ -89,7 +115,7 @@ npx github:joypop-lguplus/claude-sdd check
 npx github:joypop-lguplus/claude-sdd doctor
 ```
 
-## 5단계: SDD 사용 시작
+## 6단계: SDD 사용 시작
 
 ```bash
 # 플러그인과 함께 Claude Code 실행

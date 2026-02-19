@@ -16,6 +16,8 @@ DIAGNOSTICS=""
 FORMATTER=""
 LINTER=""
 AST_GREP=false
+LSP_SERVER=""
+LSP_AVAILABLE=false
 
 # 명령어 존재 여부 확인
 cmd_exists() { command -v "$1" &>/dev/null; }
@@ -53,6 +55,11 @@ detect_typescript_js() {
       elif echo "$pkg" | grep -q '"eslint"'; then
         LINTER="eslint"
       fi
+      # LSP 서버
+      if cmd_exists typescript-language-server; then
+        LSP_SERVER="typescript-language-server --stdio"
+        LSP_AVAILABLE=true
+      fi
     else
       LANGUAGE="javascript"
       # 진단
@@ -70,6 +77,11 @@ detect_typescript_js() {
         LINTER="biome lint"
       elif echo "$pkg" | grep -q '"eslint"'; then
         LINTER="eslint"
+      fi
+      # LSP 서버
+      if cmd_exists typescript-language-server; then
+        LSP_SERVER="typescript-language-server --stdio"
+        LSP_AVAILABLE=true
       fi
     fi
     return 0
@@ -100,6 +112,11 @@ detect_python() {
     elif cmd_exists flake8; then
       LINTER="flake8"
     fi
+    # LSP 서버
+    if cmd_exists pyright-langserver; then
+      LSP_SERVER="pyright-langserver --stdio"
+      LSP_AVAILABLE=true
+    fi
     return 0
   fi
   return 1
@@ -117,6 +134,11 @@ detect_go() {
     elif cmd_exists staticcheck; then
       LINTER="staticcheck ./..."
     fi
+    # LSP 서버
+    if cmd_exists gopls; then
+      LSP_SERVER="gopls serve"
+      LSP_AVAILABLE=true
+    fi
     return 0
   fi
   return 1
@@ -131,6 +153,11 @@ detect_rust() {
     fi
     if cmd_exists cargo-clippy || cmd_exists clippy-driver; then
       LINTER="cargo clippy"
+    fi
+    # LSP 서버
+    if cmd_exists rust-analyzer; then
+      LSP_SERVER="rust-analyzer"
+      LSP_AVAILABLE=true
     fi
     return 0
   fi
@@ -175,6 +202,11 @@ detect_cpp() {
       if cmd_exists clang-format; then
         FORMATTER="clang-format -i"
       fi
+      # LSP 서버
+      if cmd_exists clangd; then
+        LSP_SERVER="clangd --log=error"
+        LSP_AVAILABLE=true
+      fi
       return 0
     fi
   fi
@@ -197,6 +229,8 @@ cat <<EOF
   "diagnostics": "$DIAGNOSTICS",
   "formatter": "$FORMATTER",
   "linter": "$LINTER",
-  "ast_grep": $AST_GREP
+  "ast_grep": $AST_GREP,
+  "lsp_server": "$LSP_SERVER",
+  "lsp_available": $LSP_AVAILABLE
 }
 EOF

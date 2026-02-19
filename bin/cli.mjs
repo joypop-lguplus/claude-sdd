@@ -2,7 +2,7 @@
 
 import { header, colors } from '../lib/utils.mjs';
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const [,, command, ...args] = process.argv;
 
 async function main() {

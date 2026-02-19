@@ -1,0 +1,30 @@
+# LSP 설정 — sdd-config.yaml에 추가
+# Language Server Protocol 기반 의미 분석 설정
+
+lsp:
+  # LSP 통합 활성화 여부 (true/false)
+  enabled: true
+
+  # 사용할 언어 서버 (auto = 프로젝트 언어에 따라 자동 선택)
+  server: auto
+
+  # 진단 결과 대기 시간 (밀리초)
+  diagnostics_wait_ms: 3000
+
+  # 언어별 서버 오버라이드 (선택 사항)
+  # servers:
+  #   typescript:
+  #     command: typescript-language-server
+  #     args: ["--stdio"]
+  #   python:
+  #     command: pyright-langserver
+  #     args: ["--stdio"]
+  #   go:
+  #     command: gopls
+  #     args: ["serve"]
+  #   rust:
+  #     command: rust-analyzer
+  #     args: []
+  #   cpp:
+  #     command: clangd
+  #     args: ["--log=error"]

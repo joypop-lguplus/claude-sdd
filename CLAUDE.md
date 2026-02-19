@@ -25,7 +25,7 @@ node bin/cli.mjs version     # 버전 표시
 ### 플러그인 매니페스트
 `.claude-plugin/plugin.json` -- 모든 스킬, 에이전트, 훅을 Claude Code에 등록합니다.
 
-### 스킬 (`skills/` 내 10개 슬래시 명령어)
+### 스킬 (`skills/` 내 11개 슬래시 명령어)
 각 스킬은 Claude가 읽고 실행하는 절차적 지시사항이 담긴 `SKILL.md` 파일입니다. 라이프사이클 흐름:
 
 ```
@@ -39,6 +39,7 @@ node bin/cli.mjs version     # 버전 표시
 /sdd-integrate → PR 생성 + 문서화
 /sdd-status    → 상태 대시보드
 /sdd-lint      → 코드 분석 (진단, 검색, 심볼, 포맷)
+/sdd-lsp       → LSP 기반 의미 분석 (진단, 정의, 참조, 심볼, 호출 계층)
 ```
 
 ### 에이전트 (`agents/` 내 5개)
@@ -47,7 +48,7 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 - **sdd-spec-writer** -- 기술 스펙 문서 생성
 - **sdd-implementer** -- 워크 패키지를 구현하는 팀 멤버
 - **sdd-reviewer** -- 체크리스트 대비 스펙 준수 검증
-- **sdd-code-analyzer** -- 자동 진단, ast-grep, 포매팅 실행
+- **sdd-code-analyzer** -- 자동 진단, ast-grep, LSP, 포매팅 실행
 
 ### 품질 루프 (`/sdd-build`의 핵심 메커니즘)
 리더(Opus)가 팀 멤버(Sonnet, `sdd-implementer`)에게 워크 패키지를 할당합니다. 각 워크 패키지 완료 후 리더가 체크리스트를 검증합니다: 전부 `[x]` = 진행, `[ ]` 잔여 = 구체적 피드백과 함께 재작업, 3회 실패 = 사용자에게 에스컬레이션.
@@ -59,7 +60,10 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 - `checklists/` -- 스펙 준수 및 품질 게이트 체크리스트 템플릿
 
 ### 도구 감지 (`scripts/sdd-detect-tools.sh`)
-프로젝트 언어 및 사용 가능한 린터/포매터를 자동 감지합니다. JSON 출력. TypeScript, Python, Go, Rust, Java, Kotlin, C++ 지원.
+프로젝트 언어 및 사용 가능한 린터/포매터/LSP 서버를 자동 감지합니다. JSON 출력. TypeScript, Python, Go, Rust, Java, Kotlin, C++ 지원.
+
+### LSP 통합 (`lib/lsp/` + `scripts/sdd-lsp.mjs`)
+Language Server Protocol 기반 의미 분석. Per-request 수명주기 (시작→쿼리→종료). 5개 언어 서버 지원 (typescript-language-server, pyright-langserver, gopls, rust-analyzer, clangd). 서버 미설치 시 네이티브 도구로 자동 폴백.
 
 ### 세션 훅 (`hooks/hooks.json` + `scripts/sdd-session-init.sh`)
 세션 시작 시 실행되어 현재 프로젝트가 SDD를 사용하는지 자동 감지하고 단계/진행 상황을 표시합니다.
@@ -69,10 +73,13 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 - `checker.mjs` -- 의존성 검사 로직
 - `installer.mjs` -- 설치 마법사
 - `doctor.mjs` -- 진단 및 파일 무결성 검증
+- `lsp/client.mjs` -- JSON-RPC 2.0 LSP 클라이언트
+- `lsp/servers.mjs` -- 언어 서버 레지스트리
+- `lsp/bridge.mjs` -- 고수준 LSP 브릿지
 
 ## 주요 규칙
 
 - **체크리스트가 단일 진실 소스** -- 모든 진행 상황은 대상 프로젝트의 SDD 디렉토리 내 `06-spec-checklist.md`에서 추적됩니다.
 - **ESM 전용** -- 모든 `.mjs` 파일은 ES 모듈 import를 사용합니다.
 - **외부 의존성 없음** -- 플러그인은 Node.js 내장 모듈과 셸 명령어만 사용합니다.
-- **버전은 세 곳에서 업데이트 필수**: `package.json`, `.claude-plugin/plugin.json`, `marketplace.json`.
+- **버전은 네 곳에서 업데이트 필수**: `package.json`, `.claude-plugin/plugin.json`, `marketplace.json`, `bin/cli.mjs`.

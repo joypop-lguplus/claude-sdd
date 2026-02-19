@@ -82,6 +82,7 @@ claude --plugin-dir .
 | `/sdd-integrate` | Integration, PR creation, documentation |
 | `/sdd-status` | Status dashboard with progress tracking |
 | `/sdd-lint` | Code analysis: diagnostics, search, symbols, format |
+| `/sdd-lsp` | LSP-based semantic analysis: diagnostics, definitions, references, symbols, call hierarchy |
 
 ### Agents
 
@@ -91,7 +92,7 @@ claude --plugin-dir .
 | `sdd-spec-writer` | Generates technical specs and checklists |
 | `sdd-implementer` | Implements work packages (Agent Teams member) |
 | `sdd-reviewer` | Verifies implementation against spec checklist |
-| `sdd-code-analyzer` | Automated code analysis with native tools and ast-grep |
+| `sdd-code-analyzer` | Automated code analysis with native tools, ast-grep, and LSP |
 
 ### The Quality Loop
 
@@ -117,6 +118,7 @@ Leader: Verifies checklist
 | Agent Teams | **Yes** | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
 | `gh` CLI | Recommended | For PR creation |
 | ast-grep (`sg`) | Optional | For `/sdd-lint search` and `/sdd-lint symbols` |
+| Language Server | Optional | For `/sdd-lsp` semantic analysis (per-language) |
 | Confluence MCP | Optional | For `/sdd-intake confluence:...` |
 | Jira MCP | Optional | For `/sdd-intake jira:...` |
 
@@ -159,7 +161,8 @@ claude-sdd/
 │   ├── sdd-review/SKILL.md
 │   ├── sdd-integrate/SKILL.md
 │   ├── sdd-status/SKILL.md
-│   └── sdd-lint/SKILL.md
+│   ├── sdd-lint/SKILL.md
+│   └── sdd-lsp/SKILL.md
 ├── templates/
 │   ├── claude-md/
 │   ├── specs/
@@ -167,13 +170,18 @@ claude-sdd/
 │   └── project-init/
 ├── scripts/
 │   ├── sdd-session-init.sh
-│   └── sdd-detect-tools.sh
+│   ├── sdd-detect-tools.sh
+│   └── sdd-lsp.mjs
 ├── bin/cli.mjs
 ├── lib/
 │   ├── utils.mjs
 │   ├── checker.mjs
 │   ├── installer.mjs
-│   └── doctor.mjs
+│   ├── doctor.mjs
+│   └── lsp/
+│       ├── client.mjs
+│       ├── servers.mjs
+│       └── bridge.mjs
 ├── docs/
 │   ├── architecture.md
 │   ├── setup-guide.md

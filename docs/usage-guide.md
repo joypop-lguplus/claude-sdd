@@ -227,6 +227,57 @@ SDD 상태 대시보드
 - `/sdd-review` 단계: 품질 게이트에 진단 결과 포함 (에러 0건 필수)
 - `/sdd-spec` 단계 (레거시): 심볼 추출을 통한 기존 코드베이스 구조 파악
 
+## LSP 의미 분석 (`/sdd-lsp`)
+
+Language Server Protocol을 활용한 정확한 의미 수준 코드 분석:
+
+```bash
+# 언어 서버 설치 상태 확인
+/sdd-lsp status
+
+# LSP 진단 (타입 에러, 미해결 참조 등)
+/sdd-lsp diagnostics src/user/controller.ts
+
+# 정의 위치로 이동
+/sdd-lsp definition src/user/controller.ts 28 15
+
+# 참조 찾기 (영향 분석)
+/sdd-lsp references src/user/model.ts 12 10
+
+# 타입/문서 정보
+/sdd-lsp hover src/user/controller.ts 28 15
+
+# 문서 심볼 추출 (LSP 기반, 더 정확)
+/sdd-lsp symbols src/user/controller.ts
+
+# 워크스페이스 심볼 검색
+/sdd-lsp workspace-symbols "UserController"
+
+# 인터페이스 구현 찾기
+/sdd-lsp implementations src/types.ts 15 10
+
+# 호출 계층 분석
+/sdd-lsp incoming-calls src/user/controller.ts 28 15
+/sdd-lsp outgoing-calls src/user/controller.ts 28 15
+```
+
+### 지원 언어 서버
+
+| 언어 | 서버 | 설치 |
+|------|------|------|
+| TypeScript/JS | `typescript-language-server` | `npm i -g typescript-language-server typescript` |
+| Python | `pyright-langserver` | `npm i -g pyright` |
+| Go | `gopls` | `go install golang.org/x/tools/gopls@latest` |
+| Rust | `rust-analyzer` | `rustup component add rust-analyzer` |
+| C/C++ | `clangd` | OS 패키지 매니저 |
+
+### `/sdd-lint`와의 관계
+
+`/sdd-lsp`는 `/sdd-lint`를 **보완**합니다:
+- `/sdd-lint` — 네이티브 도구 (tsc, ruff 등) + ast-grep 기반 분석
+- `/sdd-lsp` — Language Server 기반 의미 분석 (더 정확한 타입 정보)
+- LSP 서버가 없으면 `/sdd-lint`로 자동 폴백
+
 ## 팁
 
 - **단계 재진입**: 언제든지 `/sdd-*` 명령어를 실행하여 특정 단계를 다시 수행하거나 개선할 수 있습니다.

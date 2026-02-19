@@ -1,5 +1,29 @@
 # 변경 이력
 
+## [0.3.0] - 2026-02-19
+
+### 추가
+
+- **`/sdd-lsp` 스킬**: LSP 기반 의미 분석 — 10개 서브커맨드 (diagnostics, definition, references, hover, symbols, workspace-symbols, implementations, incoming-calls, outgoing-calls, status)
+- **`lib/lsp/client.mjs`**: JSON-RPC 2.0 LSP 클라이언트 (Content-Length 프레이밍, 타임아웃, EventEmitter 기반 알림)
+- **`lib/lsp/servers.mjs`**: 5개 언어 서버 레지스트리 (TypeScript, Python, Go, Rust, C/C++) 및 파일/언어 기반 서버 조회
+- **`lib/lsp/bridge.mjs`**: 고수준 LSP 브릿지 — initialize 핸드셰이크, 문서 수명주기, 10개 LSP 오퍼레이션
+- **`scripts/sdd-lsp.mjs`**: CLI 브릿지 — 프로젝트 루트 자동 감지, 1-based/0-based 좌표 변환, JSON 출력, 60초 타임아웃
+- **`templates/project-init/lsp-config.yaml.tmpl`**: sdd-config.yaml용 LSP 설정 템플릿
+
+### 변경
+
+- **`scripts/sdd-detect-tools.sh`**: 각 언어 감지에 LSP 서버 존재 확인 추가, JSON 출력에 `lsp_server`, `lsp_available` 필드 추가
+- **`lib/checker.mjs`**: 5개 LSP 서버 설치 상태 검사 추가 (tools 카테고리, 선택 사항)
+- **`lib/doctor.mjs`**: 신규 LSP 파일 6개 무결성 검사 + `sdd-lsp.mjs` 실행 권한 검사 추가
+- **`lib/installer.mjs`**: 코드 분석 도구 섹션에 LSP 서버별 설치 옵션 추가 (npm/pip/go/rustup/brew)
+- **`skills/sdd-lint/SKILL.md`**: diagnostics, symbols 서브커맨드에 "LSP 향상" 섹션 추가, 의존성에 Language Server 추가
+- **`agents/sdd-code-analyzer.md`**: "5. LSP 기반 의미 분석" 모드 추가, 규칙에 "LSP 우선, 네이티브 대체" 추가
+- **`templates/claude-md/sdd-member.md.tmpl`**: 완료 전 코드 품질 검사에 LSP 진단 항목 추가
+- **`plugin.json`**: sdd-lsp 스킬 등록, `lsp`, `language-server` 키워드 추가
+- **`marketplace.json`**: sdd-lsp 스킬, `lsp_servers` 선택적 의존성, LSP 태그 추가
+- **버전**: `0.2.0` → `0.3.0` (package.json, plugin.json, marketplace.json, cli.mjs)
+
 ## [0.2.0] - 2026-02-19
 
 ### 추가

@@ -3,7 +3,7 @@
   "plugin": {
     "name": "claude-sdd",
     "display_name": "claude-sdd",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Spec-Driven Development lifecycle with Claude Code Agent Teams. Manages the full development lifecycle from requirements gathering through implementation, quality verification, and integration.",
     "short_description": "SDD lifecycle management with Agent Teams",
     "repository": "https://github.com/joypop-lguplus/claude-sdd",
@@ -32,7 +32,9 @@
       "checklist",
       "lint",
       "code-analysis",
-      "ast-grep"
+      "ast-grep",
+      "lsp",
+      "language-server"
     ],
     "min_claude_code_version": "1.0.33",
     "platforms": ["darwin", "linux"],
@@ -77,6 +79,10 @@
         {
           "name": "sdd-lint",
           "description": "Code analysis: diagnostics, structural search, symbols, formatting"
+        },
+        {
+          "name": "sdd-lsp",
+          "description": "LSP-based semantic analysis: diagnostics, definitions, references, symbols, call hierarchy"
         }
       ],
       "agents": [
@@ -98,7 +104,7 @@
         },
         {
           "name": "sdd-code-analyzer",
-          "description": "Automated code analysis with native tools and ast-grep"
+          "description": "Automated code analysis with native tools, ast-grep, and LSP"
         }
       ],
       "mcp_servers": [],
@@ -129,6 +135,10 @@
       "ast_grep": {
         "install": "https://ast-grep.github.io/guide/quick-start.html",
         "purpose": "Structural code search and symbol extraction in /sdd-lint"
+      },
+      "lsp_servers": {
+        "purpose": "LSP-based semantic analysis in /sdd-lsp",
+        "note": "Language-specific: typescript-language-server, pyright-langserver, gopls, rust-analyzer, clangd"
       }
     },
     "screenshots": [],
