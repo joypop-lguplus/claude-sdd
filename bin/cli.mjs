@@ -25,10 +25,7 @@ async function main() {
     case 'install': {
       header('claude-sdd \u2014 설치 마법사');
       const { runInstaller } = await import('../lib/installer.mjs');
-      const installOpts = {};
-      if (args.includes('--project')) installOpts.scope = 'project';
-      else if (args.includes('--global')) installOpts.scope = 'global';
-      await runInstaller(installOpts);
+      await runInstaller();
       break;
     }
 
@@ -75,7 +72,7 @@ function printHelp() {
   console.log('  claude-sdd <명령어>');
   console.log();
   console.log(colors.bold('명령어:'));
-  console.log('  install     설치 마법사 실행 [--global | --project]');
+  console.log('  install     설치 마법사 실행');
   console.log('  uninstall   플러그인 제거');
   console.log('  check       의존성 상태 확인');
   console.log('  doctor      정밀 진단');
