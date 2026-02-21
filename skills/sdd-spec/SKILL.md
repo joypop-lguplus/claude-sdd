@@ -209,6 +209,60 @@ description: 요구사항으로부터 기술 스펙과 준수 체크리스트를
 
 ---
 
+## 다이어그램 자동 생성
+
+스펙 생성 완료 후, 스펙 검토 요약을 출력하기 전에 다이어그램 PNG를 자동 생성합니다.
+
+### 단일 도메인
+
+1. `docs/specs/diagrams/` 디렉토리를 생성합니다 (없으면).
+2. 각 스펙 파일에 대해 `scripts/sdd-generate-diagram.py`를 호출합니다:
+
+| 입력 파일 | --type | 출력 PNG |
+|----------|--------|---------|
+| `docs/specs/02-architecture.md` | `dependency` | `docs/specs/diagrams/02-module-dependency.png` |
+| `docs/specs/04-data-model.md` | `er` | `docs/specs/diagrams/04-er-diagram.png` |
+| `docs/specs/05-component-breakdown.md` | `interaction` | `docs/specs/diagrams/05-component-interaction.png` |
+
+3. 실패 시 경고만 표시하고 계속 진행합니다 (graceful degradation):
+   ```
+   ⚠ 다이어그램 생성 실패: 02-module-dependency.png (graphviz 미설치)
+   ```
+
+### 멀티 도메인
+
+1. **프로젝트 수준**: `docs/specs/diagrams/` 디렉토리에 생성
+
+| 입력 파일 | --type | 출력 PNG |
+|----------|--------|---------|
+| `docs/specs/02-architecture.md` | `domain` | `docs/specs/diagrams/02-domain-boundary.png` |
+
+2. **도메인별**: `docs/specs/domains/<id>/diagrams/` 디렉토리에 생성
+
+| 입력 파일 | --type | 출력 PNG |
+|----------|--------|---------|
+| `domains/<id>/02-architecture.md` | `dependency` | `domains/<id>/diagrams/02-domain-dependency.png` |
+| `domains/<id>/04-data-model.md` | `er` | `domains/<id>/diagrams/04-er-diagram.png` |
+| `domains/<id>/05-component-breakdown.md` | `interaction` | `domains/<id>/diagrams/05-component-interaction.png` |
+
+3. **크로스 도메인**: `docs/specs/cross-domain/diagrams/` 디렉토리에 생성
+
+| 입력 파일 | --type | 출력 PNG |
+|----------|--------|---------|
+| `cross-domain/dependency-map.md` | `dependency` | `cross-domain/diagrams/cross-domain-dependency.png` |
+
+### 요약 출력
+
+다이어그램 생성 결과를 스펙 검토 요약에 포함합니다:
+```
+다이어그램:
+  02-module-dependency.png  ✓ 생성 (4개 모듈, 3개 의존성)
+  04-er-diagram.png         ✓ 생성 (5개 엔티티, 4개 관계)
+  05-component-interaction.png ⚠ 실패 (graphviz 미설치)
+```
+
+---
+
 ## 스펙 검토
 
 생성 후 요약을 표시합니다:

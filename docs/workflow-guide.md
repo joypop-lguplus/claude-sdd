@@ -458,11 +458,15 @@ npx github:joypop-lguplus/claude-sdd install
 
 ### 다이어그램
 
-스펙에서 다이어그램이 감지되면 PNG로 자동 생성하여 Confluence 페이지에 첨부합니다:
-- **architecture**: 시스템 구성도 (Python diagrams 라이브러리)
-- **dependency**: 모듈 의존성 (Graphviz DOT)
-- **er**: 엔티티 관계도 (Graphviz DOT)
-- **interaction**: 컴포넌트 상호작용 (Graphviz DOT)
+`sdd-spec` 단계에서 스펙 생성 후 자동으로 PNG 다이어그램이 `docs/specs/diagrams/`에 생성됩니다. `sdd-publish` 시에는 이 PNG를 재사용하여 Confluence 페이지에 첨부합니다 (소스 md보다 오래된 경우에만 재생성).
+
+다이어그램 유형:
+- **dependency**: 모듈 의존성 (Graphviz DOT) → `02-module-dependency.png`
+- **er**: 엔티티 관계도 (Graphviz DOT) → `04-er-diagram.png`
+- **interaction**: 컴포넌트 상호작용 (Graphviz DOT) → `05-component-interaction.png`
+- **domain**: 도메인 경계 (Python diagrams 라이브러리) → `02-domain-boundary.png`
+
+마크다운 스펙에서는 `![alt](diagrams/xxx.png)` 이미지 참조를 사용하여, GitHub과 Confluence 모두에서 정상적으로 렌더링됩니다.
 
 ---
 

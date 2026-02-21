@@ -74,6 +74,7 @@ claude-sdd/
                      --> 04-data-model.md (또는 04-data-migration.md)
                      --> 05-component-breakdown.md (또는 05-component-changes.md)
                      --> 06-spec-checklist.md
+                     --> diagrams/*.png (자동 생성)
     |
     v
 [/claude-sdd:sdd-plan]   --> 07-task-plan.md
@@ -195,6 +196,49 @@ Phase 7: PR 생성 (변경 추적성 포함)
 - `--from-analysis`: 분석 보고서(`10-analysis-report.md`)의 갭 항목에서 CR 자동 생성
 - `--lightweight --from-analysis`: 소규모 갭(5개 이하) 빠른 처리 — Phase 1-4 자동 설정, Phase 5(빌드)+6(검증)+7(PR)만 실행
 
+## 다이어그램 파이프라인
+
+PNG 다이어그램은 두 단계로 나뉘어 생성/활용됩니다:
+
+```
+[1] sdd-spec 단계 (스펙 생성 직후)
+    |
+    |-- 02-architecture.md, 04-data-model.md, 05-component-breakdown.md 파싱
+    |   |
+    |   v
+    |   scripts/sdd-generate-diagram.py
+    |       extract_modules()   ← "모듈 책임"/"컴포넌트" 섹션의 ### 헤더만 추출
+    |       extract_relations() ← **의존성**: targets 패턴 + "관계" 테이블 + 화살표 fallback
+    |       extract_entities()  ← "엔티티" 섹션 범위 한정 + 필드/관계 테이블
+    |       → PNG 파일 생성
+    |
+    |-- 영구 저장:
+    |   docs/specs/diagrams/                    ← 단일 도메인 / 프로젝트 수준
+    |   docs/specs/domains/<id>/diagrams/       ← 도메인별
+    |   docs/specs/cross-domain/diagrams/       ← 크로스 도메인
+    |
+    |-- 마크다운에 이미지 참조: ![alt](diagrams/xxx.png)
+
+[2] sdd-publish 단계 (Confluence 퍼블리싱)
+    |
+    |-- docs/specs/diagrams/ PNG 존재 + 소스 md보다 최신? → 재사용
+    |-- PNG 없거나 오래됨? → sdd-generate-diagram.py로 재생성
+    |
+    |-- ![](diagrams/xxx.png) → <ac:image><ri:attachment ri:filename="xxx.png"/></ac:image>
+    |-- scripts/sdd-confluence-upload.py → 첨부 업로드
+```
+
+### PNG 파일명 규칙
+
+| 스펙 파일 | PNG 파일명 | 위치 |
+|----------|-----------|------|
+| `02-architecture.md` (단일) | `02-module-dependency.png` | `docs/specs/diagrams/` |
+| `04-data-model.md` | `04-er-diagram.png` | `docs/specs/diagrams/` |
+| `05-component-breakdown.md` | `05-component-interaction.png` | `docs/specs/diagrams/` |
+| `02-architecture.md` (멀티) | `02-domain-boundary.png` | `docs/specs/diagrams/` |
+| 도메인 `02-architecture.md` | `02-domain-dependency.png` | `domains/<id>/diagrams/` |
+| `cross-domain/dependency-map.md` | `cross-domain-dependency.png` | `cross-domain/diagrams/` |
+
 ## Confluence 퍼블리싱 아키텍처
 
 `/claude-sdd:sdd-publish`는 SDD 산출물을 Confluence에 자동 퍼블리싱합니다:
@@ -210,13 +254,9 @@ sdd-config.yaml (publishing 설정)
     |
     |-- 변경된 파일만:
     |   |-- 마크다운 → Confluence storage format 변환
-    |   |-- 다이어그램 플레이스홀더 감지
-    |   |   |
-    |   |   v
-    |   |   scripts/sdd-generate-diagram.py
-    |   |       (architecture → diagrams 라이브러리)
-    |   |       (dependency/er/interaction → graphviz DOT)
-    |   |       → PNG 파일 생성
+    |   |-- ![](diagrams/xxx.png) → <ac:image> 변환
+    |   |
+    |   |-- docs/specs/diagrams/ PNG 재사용 (최신이면) 또는 재생성
     |   |
     |   |-- MCP confluence_create_page / confluence_update_page
     |   |-- scripts/sdd-confluence-upload.py

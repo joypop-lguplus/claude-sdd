@@ -23,7 +23,6 @@ import json
 import os
 import re
 import sys
-import tempfile
 
 
 def parse_args():
@@ -43,52 +42,169 @@ def read_markdown(path):
 
 
 def extract_modules(content):
-    """마크다운에서 모듈/컴포넌트 목록을 추출합니다."""
+    """마크다운에서 모듈/컴포넌트 목록을 추출합니다.
+
+    "모듈 책임", "도메인 내부 모듈 상세", "컴포넌트" 섹션의 ### 헤더만 추출합니다.
+    괄호 설명(예: "device (단말기 도메인)" → "device")은 제거합니다.
+    """
     modules = []
-    # ## 또는 ### 헤더에서 모듈명 추출
-    for match in re.finditer(r'^#{2,3}\s+(.+?)(?:\s*[-—].*)?$', content, re.MULTILINE):
-        name = match.group(1).strip()
-        if name and len(name) < 50:
-            modules.append(name)
+    in_module_section = False
+
+    for line in content.split('\n'):
+        # "모듈 책임", "도메인 내부 모듈 상세", "컴포넌트" 섹션 시작 감지
+        if re.match(r'^##\s+(모듈\s*책임|도메인\s*내부\s*모듈\s*상세|컴포넌트)', line):
+            in_module_section = True
+            continue
+
+        # 다른 ## 섹션이 나오면 모듈 섹션 종료
+        if re.match(r'^##\s+', line) and in_module_section:
+            in_module_section = False
+            continue
+
+        # 모듈 섹션 내의 ### 헤더에서 모듈명 추출
+        if in_module_section:
+            mod_match = re.match(r'^###\s+(.+)', line)
+            if mod_match:
+                name = mod_match.group(1).strip()
+                # 괄호 설명 제거: "device (단말기 도메인)" → "device"
+                name = re.sub(r'\s*\(.*?\)\s*$', '', name)
+                # 마크다운 스타일링 제거
+                name = name.strip('`*_ ')
+                if name and len(name) < 50:
+                    modules.append(name)
+
     return modules
 
 
 def extract_entities(content):
-    """마크다운에서 엔티티와 필드를 추출합니다."""
+    """마크다운에서 엔티티와 필드를 추출합니다.
+
+    "엔티티" 섹션 내의 ### 헤더(대문자 시작)를 엔티티로 인식합니다.
+    "관계" 테이블에서 ER 관계도 추출합니다.
+    """
     entities = {}
     current_entity = None
+    in_entity_section = False
 
     for line in content.split('\n'):
-        # 엔티티 헤더 (### EntityName 또는 ## EntityName)
-        entity_match = re.match(r'^#{2,3}\s+(\w+)', line)
+        # "엔티티" 섹션 시작 감지
+        if re.match(r'^##\s+엔티티', line):
+            in_entity_section = True
+            continue
+
+        # "열거형", "마이그레이션" 등 다른 ## 섹션이 나오면 엔티티 섹션 종료
+        if re.match(r'^##\s+', line) and in_entity_section:
+            in_entity_section = False
+            current_entity = None
+            continue
+
+        if not in_entity_section:
+            continue
+
+        # 엔티티 헤더 (### EntityName)
+        entity_match = re.match(r'^###\s+`?(\w+)`?', line)
         if entity_match:
             name = entity_match.group(1)
             if name[0].isupper():
                 current_entity = name
                 entities[current_entity] = []
+            continue
 
-        # 필드 (- fieldName: Type 또는 | fieldName | Type |)
+        # 필드 추출 (테이블 형식: | fieldName | Type | ... |)
         if current_entity:
-            field_match = re.match(r'^\s*[-*]\s+`?(\w+)`?\s*[:\|]\s*(.+)', line)
-            if field_match:
-                entities[current_entity].append(field_match.group(1))
-
             table_match = re.match(r'^\|\s*`?(\w+)`?\s*\|', line)
-            if table_match and table_match.group(1) not in ('필드', 'Field', '---', 'name', 'Name'):
-                entities[current_entity].append(table_match.group(1))
+            if table_match:
+                field_name = table_match.group(1)
+                # 테이블 헤더, 구분선, 메타 키워드 제외
+                if field_name not in ('필드', 'Field', '---', 'name', 'Name', '이름',
+                                      '관계', '인덱스', 'Index', '값', 'Value'):
+                    entities[current_entity].append(field_name)
 
     return entities
 
 
 def extract_relations(content):
-    """마크다운에서 관계(FK, 참조)를 추출합니다."""
+    """마크다운에서 관계(FK, 참조)를 추출합니다.
+
+    두 가지 패턴을 지원합니다:
+    1. "**의존성**: moduleA (설명), moduleB (설명)" 패턴 (모듈 책임 섹션)
+    2. "A → B" 또는 "A -> B" 화살표 패턴 (fallback)
+    3. "관계" 테이블의 대상 컬럼에서 ER 관계 추출
+    """
     relations = []
-    # "A → B" 또는 "A -> B" 패턴
-    for match in re.finditer(r'(\w+)\s*(?:→|->|depends on|references)\s*(\w+)', content, re.IGNORECASE):
-        relations.append((match.group(1), match.group(2)))
-    # FK 패턴: "FK: entity_id → Entity"
-    for match in re.finditer(r'FK[:\s]+\w+\s*(?:→|->)\s*(\w+)', content, re.IGNORECASE):
-        pass  # already captured above
+    seen = set()
+
+    def add_relation(src, dst):
+        key = (src, dst)
+        if key not in seen:
+            seen.add(key)
+            relations.append(key)
+
+    # 패턴 1: "모듈 책임" / "도메인 내부 모듈 상세" 섹션에서 ### module → **의존성**: targets 파싱
+    in_module_section = False
+    current_module = None
+
+    for line in content.split('\n'):
+        if re.match(r'^##\s+(모듈\s*책임|도메인\s*내부\s*모듈\s*상세|컴포넌트)', line):
+            in_module_section = True
+            continue
+        if re.match(r'^##\s+', line) and in_module_section:
+            in_module_section = False
+            current_module = None
+            continue
+
+        if in_module_section:
+            mod_match = re.match(r'^###\s+(.+)', line)
+            if mod_match:
+                name = mod_match.group(1).strip()
+                name = re.sub(r'\s*\(.*?\)\s*$', '', name)
+                current_module = name.strip('`*_ ')
+                continue
+
+            if current_module:
+                dep_match = re.match(r'^\s*-\s+\*\*의존성\*\*\s*:\s*(.+)', line)
+                if dep_match:
+                    deps_str = dep_match.group(1).strip()
+                    if deps_str.lower() in ('없음', 'none', '—', '-', ''):
+                        continue
+                    # "moduleA (설명), moduleB (설명)" 또는 "moduleA, moduleB"
+                    for dep in re.split(r',\s*', deps_str):
+                        dep_name = re.sub(r'\s*\(.*?\)', '', dep).strip('`*_ ')
+                        if dep_name and dep_name.lower() not in ('없음', 'none', '—', '-'):
+                            add_relation(current_module, dep_name)
+
+    # 패턴 2: "관계" 테이블에서 ER 관계 추출 (| 관계 | 대상 | 타입 | FK | 삭제 시 |)
+    current_entity = None
+    in_relation_table = False
+
+    for line in content.split('\n'):
+        entity_match = re.match(r'^###\s+`?(\w+)`?', line)
+        if entity_match:
+            name = entity_match.group(1)
+            if name[0].isupper():
+                current_entity = name
+                in_relation_table = False
+            continue
+
+        if current_entity and re.match(r'^\|\s*관계\s*\|\s*대상\s*\|', line):
+            in_relation_table = True
+            continue
+
+        if in_relation_table and current_entity:
+            if re.match(r'^\|\s*[-:]+\s*\|', line):
+                continue
+            rel_match = re.match(r'^\|\s*[^|]+\|\s*`?(\w+)`?\s*\|', line)
+            if rel_match:
+                target = rel_match.group(1).strip()
+                if target and target not in ('대상', '---'):
+                    add_relation(current_entity, target)
+            elif not line.startswith('|'):
+                in_relation_table = False
+
+    # 패턴 3: 화살표 패턴 (fallback)
+    for match in re.finditer(r'(\w+)\s*(?:→|->)\s*(\w+)', content):
+        add_relation(match.group(1), match.group(2))
+
     return relations
 
 

@@ -111,6 +111,30 @@
 - 컴포넌트별 설정 요구사항
 - 에러 타입 계층 구조
 
+## 다이어그램 규칙
+
+스펙 문서에서 다이어그램은 **PNG 이미지 참조**로 표현합니다. ASCII art나 코드 블록으로 다이어그램을 직접 작성하지 마세요.
+
+### 금지 사항
+- ASCII box art 다이어그램 작성 금지 (예: `+---+`, `|   |`, `───>`)
+- 코드 블록(`````)으로 다이어그램을 작성하지 않음
+
+### 이미지 참조 유지
+템플릿에 이미 포함된 `![](diagrams/xxx.png)` 이미지 참조를 그대로 유지합니다. 스펙 작성 후 `sdd-generate-diagram.py`가 스펙 내용을 파싱하여 PNG를 자동 생성합니다.
+
+### PNG 파일명 규칙
+
+| 스펙 파일 | PNG 파일명 | 위치 |
+|----------|-----------|------|
+| `02-architecture.md` (단일) | `02-module-dependency.png` | `docs/specs/diagrams/` |
+| `04-data-model.md` | `04-er-diagram.png` | `docs/specs/diagrams/` |
+| `05-component-breakdown.md` | `05-component-interaction.png` | `docs/specs/diagrams/` |
+| `02-architecture.md` (멀티) | `02-domain-boundary.png` | `docs/specs/diagrams/` |
+| 도메인 `02-architecture.md` | `02-domain-dependency.png` | `docs/specs/domains/<id>/diagrams/` |
+| 도메인 `04-data-model.md` | `04-er-diagram.png` | `docs/specs/domains/<id>/diagrams/` |
+| 도메인 `05-component-breakdown.md` | `05-component-interaction.png` | `docs/specs/domains/<id>/diagrams/` |
+| `cross-domain/dependency-map.md` | `cross-domain-dependency.png` | `docs/specs/cross-domain/diagrams/` |
+
 ## 멀티 도메인 모드
 
 멀티 도메인 프로젝트에서 호출될 때:

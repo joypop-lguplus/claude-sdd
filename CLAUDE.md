@@ -34,7 +34,7 @@ node bin/cli.mjs version     # 버전 표시
 /claude-sdd:sdd-next      → 단계 자동 감지 후 계속 진행
 /claude-sdd:sdd-init      → 프로젝트 설정 + SDD 디렉토리 초기화 (--domains로 멀티 도메인)
 /claude-sdd:sdd-intake    → 요구사항 수집 (Confluence/Jira/Figma/파일/인터뷰). 레거시: 인터뷰 없이 기존 코드 자동 분석으로 요구사항 생성
-/claude-sdd:sdd-spec      → 기술 스펙 + 스펙 준수 체크리스트 생성
+/claude-sdd:sdd-spec      → 기술 스펙 + 스펙 준수 체크리스트 생성 + 다이어그램 PNG 자동 생성
 /claude-sdd:sdd-plan      → 태스크 분해 → 워크 패키지
 /claude-sdd:sdd-assign    → 워크 패키지에 팀 멤버 배정 + 멤버별 CLAUDE.md 생성
 /claude-sdd:sdd-build     → Agent Teams로 구현 + 품질 루프 (최대 3회 재작업 사이클)
@@ -120,7 +120,9 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 ### Confluence 퍼블리싱 (`/claude-sdd:sdd-publish`)
 SDD 산출물을 Confluence에 자동 퍼블리싱합니다. `sdd-config.yaml`의 `publishing.confluence` 섹션이 활성화되면 동작합니다. 마크다운 → Confluence storage format 변환, 다이어그램 PNG 생성/첨부, 증분 동기화(타임스탬프 비교)를 지원합니다.
 
-**다이어그램 생성**: `scripts/sdd-generate-diagram.py`가 스펙에서 architecture, dependency, ER, interaction 다이어그램을 PNG로 생성합니다 (Graphviz DOT + Python diagrams 라이브러리).
+**다이어그램 생성**: `scripts/sdd-generate-diagram.py`가 스펙에서 architecture, dependency, ER, interaction 다이어그램을 PNG로 생성합니다 (Graphviz DOT + Python diagrams 라이브러리). PNG는 `docs/specs/diagrams/`에 영구 저장됩니다 (도메인별: `docs/specs/domains/<id>/diagrams/`, 크로스 도메인: `docs/specs/cross-domain/diagrams/`). `sdd-spec` 단계에서 스펙 생성 후 자동으로 PNG를 생성하며, `sdd-publish` 단계에서는 기존 PNG가 소스보다 최신이면 재사용합니다.
+
+**PNG 파일명 규칙**: `02-module-dependency.png`, `04-er-diagram.png`, `05-component-interaction.png`, `02-domain-boundary.png`, `02-domain-dependency.png`, `cross-domain-dependency.png`
 
 **첨부 업로드**: `scripts/sdd-confluence-upload.py`가 `atlassian-python-api`를 사용하여 PNG를 Confluence 페이지에 첨부합니다. MCP 도구는 첨부를 지원하지 않으므로 별도 스크립트가 필요합니다.
 

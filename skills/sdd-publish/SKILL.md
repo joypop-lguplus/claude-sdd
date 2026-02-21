@@ -81,8 +81,10 @@ SDD 라이프사이클 산출물을 Confluence에 자동 퍼블리싱합니다. 
    - 테이블 → Confluence 테이블
    - 인라인 코드 → `<code>`
 
-2. **다이어그램 생성** (해당 파일에 다이어그램이 필요한 경우):
-   - `scripts/sdd-generate-diagram.py`를 호출하여 PNG 생성
+2. **다이어그램 준비** (해당 파일에 다이어그램이 필요한 경우):
+   - `docs/specs/diagrams/` (또는 도메인별 `diagrams/`)에 기존 PNG가 있고, 소스 md 파일보다 최신(mtime 비교)이면 **재사용**
+   - 기존 PNG가 없거나 소스보다 오래된 경우에만 `scripts/sdd-generate-diagram.py`를 호출하여 PNG 재생성
+   - 마크다운의 `![alt](diagrams/xxx.png)` → Confluence storage format `<ac:image><ri:attachment ri:filename="xxx.png"/></ac:image>`로 변환
    - 생성된 PNG를 Confluence storage format의 `<ac:image>` 태그로 삽입
 
 3. **Confluence API 호출**:
@@ -235,7 +237,7 @@ MCP 도구의 `confluence_update_page`는 첨부 파일 업로드를 지원하�
 ## 출력
 
 - Confluence 페이지 생성/업데이트
-- PNG 다이어그램 파일 (임시, 퍼블리싱 후 정리)
+- PNG 다이어그램 파일 (`docs/specs/diagrams/`에 영구 저장 — `sdd-spec` 단계에서 생성, 퍼블리싱 시 재사용)
 - `sdd-config.yaml` 업데이트 (timestamps, page_ids)
 
 ## 의존성
