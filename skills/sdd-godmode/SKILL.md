@@ -16,6 +16,19 @@ description: 심층 인터뷰를 통해 프로젝트 정보를 수집한 후 전
 
 ## 동작
 
+### Phase 0: 브랜치 확인 및 생성
+
+파이프라인 시작 전에 현재 Git 브랜치를 확인합니다.
+
+1. `git branch --show-current`로 현재 브랜치를 확인합니다.
+2. 브랜치가 `feature/`로 시작하면 **건너뜁니다**.
+3. `feature/`가 아닌 경우:
+   a. 인터뷰 섹션 4에서 Jira 키가 수집되면 자동 생성: `feature/<jira-key>`
+   b. Jira 키가 없으면 사용자에게 입력 요청
+4. `git checkout -b feature/<name>` 실행
+
+> **주의**: Phase 0은 Phase 1 인터뷰 직전에 실행합니다. Jira 키가 인터뷰에서 수집되므로, 브랜치 생성은 인터뷰 완료 직후 Phase 2(프로젝트 컨텍스트 저장) 전에 실행하는 것도 허용됩니다.
+
 ### Phase 1: 심층 인터뷰
 
 `AskUserQuestion`을 사용하여 6개 섹션으로 구조화된 인터뷰를 진행합니다. **각 섹션에서 답변이 모호하거나 불충분하면 후속 질문을 집요하게 이어갑니다.**
@@ -88,6 +101,13 @@ description: 심층 인터뷰를 통해 프로젝트 정보를 수집한 후 전
 - Figma 디자인 URL
 - 로컬 파일 경로
 - 또는 직접 입력 (인터뷰)
+
+#### 섹션 4.5: Confluence 퍼블리싱
+
+- Confluence에 산출물을 자동 퍼블리싱할 건지 질문
+- "예"인 경우: `~/.claude.json`에서 감지된 Atlassian MCP 서버 선택, 스페이스 키 또는 루트 페이지 URL 입력
+- URL 입력 시 파싱: `https://company.atlassian.net/wiki/spaces/TECH/pages/12345` → `space_key=TECH, root_page_id=12345`
+- Atlassian MCP가 없으면 건너뛰고 안내 표시
 
 #### 섹션 5: 비기능 요구사항
 

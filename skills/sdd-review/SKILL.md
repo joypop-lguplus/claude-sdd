@@ -277,6 +277,22 @@ description: 스펙 준수 체크리스트 대비 품질 게이트를 검증합�
 | 멀티 도메인 (통합) | `docs/specs/cross-domain/integration-review-report.md` |
 | 멀티 도메인 (전체/미지정) | 각 도메인의 `08-review-report.md` + `docs/specs/08-review-report.md` (통합 리포트) |
 
+## 퍼블리싱 (조건부)
+
+`sdd-config.yaml`에서 `publishing.confluence.enabled: true`인 경우, 리뷰 보고서 생성 완료 후 자동으로 Confluence에 퍼블리싱합니다.
+
+1. `publishing` 설정을 확인합니다.
+2. `enabled: true`이면 `/claude-sdd:sdd-publish --stage=review`와 동일한 로직으로 다음을 퍼블리싱합니다:
+   - `08-review-report.md` (리뷰 보고서)
+   - `06-spec-checklist.md` (최종 체크리스트 상태 업데이트)
+3. 퍼블리싱 결과를 출력합니다:
+   ```
+   Confluence 퍼블리싱:
+     06-스펙 체크리스트 ✓ 업데이트
+     08-리뷰 보고서    ✓ 신규생성
+   ```
+4. 퍼블리싱 실패 시 경고만 표시합니다.
+
 ## 의존성
 
 - `docs/specs/06-spec-checklist.md` 또는 `docs/specs/domains/<id>/06-spec-checklist.md` (`/claude-sdd:sdd-spec`에서 생성)

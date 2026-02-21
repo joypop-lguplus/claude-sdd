@@ -87,6 +87,7 @@ claude --plugin-dir .
 | `/claude-sdd:sdd-review` | Quality gate verification |
 | `/claude-sdd:sdd-integrate` | Integration, PR creation, documentation |
 | `/claude-sdd:sdd-change` | Change management: impact analysis, checklist update, TDD delta build |
+| `/claude-sdd:sdd-publish` | Publish SDD artifacts to Confluence with diagram PNG attachments |
 | `/claude-sdd:sdd-status` | Status dashboard with progress tracking |
 | `/claude-sdd:sdd-lint` | Code analysis: diagnostics, search, symbols, format |
 

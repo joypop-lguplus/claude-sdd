@@ -11,6 +11,9 @@
 | Language Server | - | 선택 |
 | Confluence MCP | - | 선택 |
 | Jira MCP | - | 선택 |
+| Figma MCP | - | 선택 |
+| Graphviz | 최신 | 선택 (다이어그램) |
+| Python diagrams | 최신 | 선택 (다이어그램) |
 
 ## 1단계: 플러그인 설치
 
@@ -54,31 +57,78 @@ Claude Code 설정에 다음을 추가합니다:
 
 ## 3단계: MCP 설정 (선택)
 
-### Confluence
+### 방법 A: 인스톨러 사용 (권장)
 
-Confluence에서 요구사항을 가져와야 하는 경우:
+인스톨러가 Atlassian MCP와 Figma MCP를 대화형으로 설정합니다:
+
+```bash
+npx github:joypop-lguplus/claude-sdd install
+# → [5/7] MCP 서버 설정 단계에서 안내
+```
+
+**Atlassian MCP 설정 항목:**
+- Atlassian URL (예: `https://company.atlassian.net`)
+- 사용자 이메일
+- API 토큰
+- MCP 서버 이름 (URL에서 자동 생성)
+- SSL 인증서 검증 비활성화 (사설망인 경우)
+- 최대 2개 사이트 지원
+
+**SSL 우회 (2계층 분리):**
+- **uvx 계층** (PyPI 다운로드): `UV_NATIVE_TLS=true` — 시스템 인증서 사용
+- **mcp-atlassian 계층** (Jira/Confluence 접속): `JIRA_SSL_VERIFY=false`, `CONFLUENCE_SSL_VERIFY=false`
+
+**Figma MCP:**
+- Remote (Figma 클라우드, OAuth): `https://mcp.figma.com/mcp`
+- Desktop (로컬 Figma 앱): `http://127.0.0.1:3845/mcp`
+
+### 방법 B: 수동 설정
+
+#### Confluence/Jira
 
 ```bash
 claude mcp add mcp-atlassian -s user -- \
   uvx mcp-atlassian \
   --confluence-url https://your-company.atlassian.net \
   --confluence-username your@email.com \
-  --confluence-token YOUR_TOKEN
-```
-
-### Jira
-
-Jira에서 요구사항을 가져와야 하는 경우:
-
-```bash
-claude mcp add mcp-atlassian -s user -- \
-  uvx mcp-atlassian \
+  --confluence-token YOUR_TOKEN \
   --jira-url https://your-company.atlassian.net \
   --jira-username your@email.com \
   --jira-token YOUR_TOKEN
 ```
 
-참고: `mcp-atlassian` 패키지는 하나의 MCP 서버에서 Confluence와 Jira를 모두 지원합니다.
+`mcp-atlassian` 패키지는 하나의 MCP 서버에서 Confluence와 Jira를 모두 지원합니다.
+
+#### Figma
+
+```bash
+# Remote (Figma 클라우드)
+claude mcp add figma -s user --transport http -- https://mcp.figma.com/mcp
+
+# Desktop (로컬 Figma 앱)
+claude mcp add figma -s user --transport http -- http://127.0.0.1:3845/mcp
+```
+
+## 3.5단계: 다이어그램 도구 설치 (선택)
+
+Confluence 퍼블리싱 시 다이어그램 PNG를 생성하려면 다음 도구가 필요합니다:
+
+```bash
+# 인스톨러로 자동 설치 (권장)
+npx github:joypop-lguplus/claude-sdd install
+# → [6/7] 다이어그램 도구 설치 단계에서 안내
+
+# 수동 설치
+brew install graphviz
+pip3 install --user diagrams graphviz atlassian-python-api
+```
+
+사설망 환경에서는 SSL 우회 옵션을 추가합니다:
+```bash
+pip3 install --user --break-system-packages \
+  --trusted-host pypi.org --trusted-host files.pythonhosted.org \
+  diagrams graphviz atlassian-python-api
+```
 
 ## 4단계: LSP 플러그인 설치 (선택)
 
@@ -143,6 +193,24 @@ claude
 # 라이프사이클 시작
 /claude-sdd:sdd-next
 ```
+
+## 제거 (Uninstall)
+
+설치한 모든 구성 요소를 일괄 제거합니다:
+
+```bash
+npx github:joypop-lguplus/claude-sdd uninstall
+```
+
+제거 대상:
+- claude-sdd 플러그인
+- LSP 플러그인 (설치된 것만)
+- MCP 서버 (mcp-atlassian-*, figma)
+- 다이어그램 도구 (graphviz, diagrams, atlassian-python-api)
+- 마켓플레이스 등록 (claude-sdd, claude-code-lsps)
+- 관련 설정값 (ENABLE_LSP_TOOL, AGENT_TEAMS)
+
+현재 설치된 항목만 선택적으로 제거하며, 없는 항목은 건너뜁니다.
 
 ## 문제 해결
 

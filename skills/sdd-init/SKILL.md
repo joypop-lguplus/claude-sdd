@@ -28,6 +28,28 @@ description: 새 프로젝트 또는 기존 프로젝트를 스펙 주도 개발
 
 ## 동작
 
+### 0단계: 브랜치 확인 및 생성
+
+현재 Git 브랜치를 확인하고, `feature/**` 패턴이 아니면 feature 브랜치를 생성합니다.
+
+1. `git branch --show-current`로 현재 브랜치를 확인합니다.
+2. 브랜치가 `feature/`로 시작하면 **건너뜁니다** (이미 feature 브랜치).
+3. `feature/`가 아닌 경우:
+   a. 사용자에게 질문된 소스 설정에 Jira 키가 있으면:
+      - Jira 키에서 자동 생성: `feature/<jira-key>` (예: `feature/DEV-100`)
+   b. Jira 키가 없으면:
+      - 사용자에게 브랜치명 입력 요청: "브랜치명을 입력하세요 (feature/ 접두사 자동 추가):"
+      - 입력값으로 `feature/<입력값>` 생성
+4. `git checkout -b feature/<name>` 실행
+5. 생성된 브랜치 정보를 이후 `sdd-config.yaml`의 `project.branch` 필드에 기록합니다.
+
+```
+현재 브랜치: main
+→ feature 브랜치가 필요합니다.
+브랜치명을 입력하세요 (feature/ 접두사 자동 추가): my-project
+→ git checkout -b feature/my-project ✓
+```
+
 ### 1단계: 스펙 디렉토리 생성
 
 `docs/specs/`가 존재하지 않으면 생성합니다.
@@ -41,7 +63,7 @@ description: 새 프로젝트 또는 기존 프로젝트를 스펙 주도 개발
 2. **설명**: 프로젝트에 대한 간략한 설명
 3. **프로젝트 유형**: 인자에 따라 `new` 또는 `legacy`를 확인
 
-템플릿을 채우고 `docs/specs/sdd-config.yaml`에 저장합니다.
+템플릿을 채우고 `docs/specs/sdd-config.yaml`에 저장합니다. 0단계에서 생성된 브랜치가 있으면 `project.branch` 필드에 기록합니다.
 
 ### 2.5단계: 도메인 정의 (`--domains` 인자가 있는 경우)
 
@@ -84,6 +106,42 @@ domains:
 docs/specs/domains/<domain-id>/   (각 도메인에 대해)
 docs/specs/cross-domain/
 ```
+
+### 2.7단계: Confluence 퍼블리싱 설정 (선택)
+
+SDD 산출물을 Confluence에 자동 퍼블리싱할지 질문합니다.
+
+1. `~/.claude.json`에서 `mcp-atlassian-*` 서버가 설정되어 있는지 확인합니다.
+2. Atlassian MCP가 없으면 이 단계를 건너뜁니다 (안내 메시지만 표시):
+   ```
+   Confluence 퍼블리싱: Atlassian MCP 미설정 (건너뜀)
+   설정하려면: claude-sdd install → MCP 서버 설정
+   ```
+3. Atlassian MCP가 있으면 질문합니다:
+   ```
+   SDD 산출물을 Confluence에 자동 퍼블리싱하시겠습니까? (y/n)
+   → y
+     사용할 MCP 서버: (감지된 atlassian MCP 서버 목록에서 선택)
+     Confluence 스페이스 키 또는 루트 페이지 URL:
+     → https://company.atlassian.net/wiki/spaces/TECH/pages/12345
+     → 파싱: space_key=TECH, root_page_id=12345
+   ```
+4. 입력을 `sdd-config.yaml`의 `publishing` 섹션에 기록합니다:
+   ```yaml
+   publishing:
+     confluence:
+       enabled: true
+       mcp_server: "mcp-atlassian-company1"
+       space_key: "TECH"
+       root_page_id: "12345"
+       diagrams:
+         enabled: true
+         tool: "auto"
+       sync:
+         strategy: "incremental"
+         timestamps: {}
+       page_ids: {}
+   ```
 
 ### 3단계: CLAUDE.md 규칙 주입
 

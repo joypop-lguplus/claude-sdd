@@ -87,6 +87,7 @@ claude --plugin-dir .
 | `/claude-sdd:sdd-review` | 품질 게이트 검증 |
 | `/claude-sdd:sdd-integrate` | 통합, PR 생성, 문서화 |
 | `/claude-sdd:sdd-change` | 변경 관리: 영향 분석, 체크리스트 갱신, TDD 델타 빌드 |
+| `/claude-sdd:sdd-publish` | SDD 산출물을 Confluence에 퍼블리싱 + 다이어그램 PNG 첨부 |
 | `/claude-sdd:sdd-status` | 진행 상황 대시보드 |
 | `/claude-sdd:sdd-lint` | 코드 분석: 진단, 검색, 심볼, 포맷 |
 

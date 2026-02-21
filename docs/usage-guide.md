@@ -307,6 +307,35 @@ SDD 상태 대시보드
 - 신규 `CHG-NNN` 항목: 변경으로 추가된 기능
 - 신규 `CHG-REG-NNN` 항목: 기존 기능 보존 검증 (회귀 테스트)
 
+## Confluence 퍼블리싱 (`/claude-sdd:sdd-publish`)
+
+SDD 산출물을 Confluence에 자동 퍼블리싱합니다. 다이어그램 PNG도 함께 첨부됩니다.
+
+### 사전 설정
+
+1. `sdd-init` 또는 `sdd-godmode` 실행 시 Confluence 퍼블리싱 설정을 활성화합니다
+2. `sdd-config.yaml`에 `publishing.confluence` 섹션이 생성됩니다
+
+### 사용법
+
+```bash
+/claude-sdd:sdd-publish                                    # 전체 산출물 퍼블리싱
+/claude-sdd:sdd-publish --stage=spec                       # 특정 단계만
+/claude-sdd:sdd-publish --domain=device-mgmt               # 특정 도메인만
+/claude-sdd:sdd-publish confluence:SPACE_KEY/PAGE_ID       # 직접 지정
+/claude-sdd:sdd-publish https://company.atlassian.net/...  # URL로 지정
+```
+
+### 동작 방식
+
+- **증분 동기화**: 파일 수정 시간(mtime)과 설정의 타임스탬프를 비교하여 변경된 파일만 퍼블리싱
+- **다이어그램 생성**: 스펙에서 architecture, dependency, ER, interaction 다이어그램을 자동 생성하여 PNG로 첨부
+- **페이지 계층**: 루트 페이지 아래에 산출물별 하위 페이지 자동 생성
+
+### 조건부 자동 퍼블리싱
+
+`publishing.confluence.enabled: true`인 경우, `sdd-intake`, `sdd-spec`, `sdd-plan`, `sdd-review` 스킬 완료 시 해당 산출물이 자동으로 퍼블리싱됩니다.
+
 ## 팁
 
 - **단계 재진입**: 언제든지 `/claude-sdd:*` 명령어를 실행하여 특정 단계를 다시 수행하거나 개선할 수 있습니다.

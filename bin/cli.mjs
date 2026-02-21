@@ -2,7 +2,7 @@
 
 import { header, colors } from '../lib/utils.mjs';
 
-const VERSION = '0.3.3';
+const VERSION = '0.4.0';
 const [,, command, ...args] = process.argv;
 
 // npx 실행인지 직접 실행인지 감지하여 안내 명령어 결정
@@ -31,7 +31,7 @@ async function main() {
 
     case 'uninstall': {
       header('claude-sdd \u2014 제거');
-      const { runUninstaller } = await import('../lib/installer.mjs');
+      const { runUninstaller } = await import('../lib/uninstaller.mjs');
       await runUninstaller();
       break;
     }

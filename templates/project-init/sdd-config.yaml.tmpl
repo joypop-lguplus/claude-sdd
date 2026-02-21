@@ -5,6 +5,7 @@ project:
   name: "{{PROJECT_NAME}}"
   type: "{{PROJECT_TYPE}}"  # new | legacy
   description: "{{PROJECT_DESCRIPTION}}"
+  branch: "{{BRANCH}}"     # feature 브랜치 (자동 기록)
 
 # 스펙 디렉토리 위치
 specs:
@@ -50,6 +51,22 @@ integration:
   update_changelog: true
   branch_prefix: "sdd/"
   pr_strategy: "single"  # single | per-domain
+
+# Confluence 퍼블리싱 설정 (선택 사항)
+# /claude-sdd:sdd-init 인터뷰에서 활성화하거나 수동으로 설정
+# publishing:
+#   confluence:
+#     enabled: true
+#     mcp_server: "mcp-atlassian-company1"   # ~/.claude.json의 MCP 서버 이름
+#     space_key: "TECH"
+#     root_page_id: "332398793"
+#     diagrams:
+#       enabled: true
+#       tool: "auto"              # auto | graphviz | diagrams
+#     sync:
+#       strategy: "incremental"
+#       timestamps: {}            # 자동 관리 — 파일별 마지막 퍼블리싱 시각
+#     page_ids: {}                # 자동 관리 — 산출물별 Confluence 페이지 ID
 
 # 레거시 모드 설정 (project.type: legacy일 때 사용)
 # legacy:

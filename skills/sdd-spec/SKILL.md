@@ -251,6 +251,24 @@ description: 요구사항으로부터 기술 스펙과 준수 체크리스트를
 다음 단계: /claude-sdd:sdd-plan [--domain=<id> | --all] — 태스크 분해
 ```
 
+## 퍼블리싱 (조건부)
+
+`sdd-config.yaml`에서 `publishing.confluence.enabled: true`인 경우, 스펙 생성 완료 후 자동으로 Confluence에 퍼블리싱합니다.
+
+1. `publishing` 설정을 확인합니다.
+2. `enabled: true`이면 `/claude-sdd:sdd-publish --stage=spec`와 동일한 로직으로 생성된 스펙 파일(02~06)을 퍼블리싱합니다.
+3. 다이어그램이 있는 파일(02-architecture, 04-data-model, 05-component)은 PNG를 함께 생성하여 첨부합니다.
+4. 퍼블리싱 결과를 출력합니다:
+   ```
+   Confluence 퍼블리싱:
+     02-아키텍처      ✓ 신규생성 (다이어그램 1개 첨부)
+     03-API 스펙      ✓ 신규생성
+     04-데이터 모델    ✓ 신규생성 (ER 다이어그램 첨부)
+     05-컴포넌트 분해  ✓ 신규생성
+     06-스펙 체크리스트 ✓ 신규생성
+   ```
+5. 퍼블리싱 실패 시 경고만 표시하고 다음 단계로 진행합니다.
+
 ## 출력
 
 - 단일 도메인: `docs/specs/02-*.md`부터 `docs/specs/06-*.md`

@@ -135,6 +135,38 @@
 | Gap | 갭 | 분석 보고서에서 식별된 스펙 미충족 항목. 유형: missing (기능 부재), partial (부분 구현), divergent (스펙과 다른 구현) |
 | Lightweight Mode | 경량 모드 | `--lightweight --from-analysis` 플래그 조합. 5개 이하 소규모 갭을 빠르게 처리. Phase 1-4 자동 설정, Phase 5-7만 실행 |
 
+## 퍼블리싱 및 다이어그램
+
+| 영어 | 한국어 | 비고 |
+|------|--------|------|
+| Publishing | 퍼블리싱 | SDD 산출물을 Confluence에 자동 게시 |
+| Confluence Storage Format | Confluence 저장 형식 | 마크다운을 변환하는 대상 형식 |
+| Incremental Sync | 증분 동기화 | 타임스탬프 비교로 변경된 파일만 퍼블리싱 |
+| Conditional Publishing | 조건부 퍼블리싱 | `publishing.confluence.enabled: true`일 때 단계 완료 후 자동 퍼블리싱 |
+| Diagram | 다이어그램 | 스펙에서 자동 생성되는 시각 자료 (PNG) |
+| Architecture Diagram | 아키텍처 다이어그램 | Python diagrams 라이브러리로 생성 |
+| Dependency Diagram | 의존성 다이어그램 | Graphviz DOT으로 생성 |
+| ER Diagram | ER 다이어그램 | 엔티티 관계도, Graphviz DOT으로 생성 |
+| Interaction Diagram | 상호작용 다이어그램 | 컴포넌트 간 흐름, Graphviz DOT으로 생성 |
+| Attachment Upload | 첨부 업로드 | `atlassian-python-api`로 PNG를 Confluence에 첨부 |
+| Root Page | 루트 페이지 | Confluence 퍼블리싱의 상위 페이지 |
+| Page Hierarchy | 페이지 계층 | 루트 페이지 아래 산출물별 하위 페이지 구조 |
+
+## 브랜치 관리
+
+| 영어 | 한국어 | 비고 |
+|------|--------|------|
+| Feature Branch | 피처 브랜치 | `feature/**` 패턴의 작업 브랜치 |
+| Branch Management | 브랜치 관리 | sdd-init/godmode/change 실행 시 자동 브랜치 확인/생성 |
+
+## 인스톨러
+
+| 영어 | 한국어 | 비고 |
+|------|--------|------|
+| MCP Server | MCP 서버 | Model Context Protocol 서버 |
+| SSL Bypass | SSL 우회 | 사설망 환경에서 인증서 검증 비활성화 |
+| Uninstaller | 언인스톨러 | 플러그인 및 관련 도구 일괄 제거 |
+
 ## 기타
 
 | 영어 | 한국어 | 비고 |

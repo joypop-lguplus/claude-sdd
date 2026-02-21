@@ -13,7 +13,8 @@ claude-sdd는 스펙 주도 개발 (SDD) -- Agent Teams를 활용한 7단계 소
 **CLI 명령어** (진입점: `bin/cli.mjs`):
 ```
 node bin/cli.mjs check      # 의존성 상태 확인
-node bin/cli.mjs install     # 대화형 설치 마법사
+node bin/cli.mjs install     # 대화형 설치 마법사 (MCP, 다이어그램 도구 포함)
+node bin/cli.mjs uninstall   # 플러그인 및 관련 도구 제거
 node bin/cli.mjs doctor      # 심층 진단 (파일 무결성, JSON 검증)
 node bin/cli.mjs version     # 버전 표시
 ```
@@ -25,7 +26,7 @@ node bin/cli.mjs version     # 버전 표시
 ### 플러그인 매니페스트
 `.claude-plugin/plugin.json` -- 모든 스킬, 에이전트, 훅을 Claude Code에 등록합니다.
 
-### 스킬 (`skills/` 내 13개 슬래시 명령어)
+### 스킬 (`skills/` 내 14개 슬래시 명령어)
 각 스킬은 Claude가 읽고 실행하는 절차적 지시사항이 담긴 `SKILL.md` 파일입니다. 라이프사이클 흐름:
 
 ```
@@ -40,6 +41,7 @@ node bin/cli.mjs version     # 버전 표시
 /claude-sdd:sdd-review    → 품질 게이트 검증 + 자동 진단
 /claude-sdd:sdd-integrate → PR 생성 + 문서화
 /claude-sdd:sdd-change    → 변경 관리 (영향 분석 → 체크리스트 갱신 → TDD 델타 빌드)
+/claude-sdd:sdd-publish   → Confluence 퍼블리싱 (마크다운 변환, 다이어그램 PNG 첨부)
 /claude-sdd:sdd-status    → 상태 대시보드
 /claude-sdd:sdd-lint      → 코드 분석 (진단, 검색, 심볼, 포맷)
 ```
@@ -115,10 +117,23 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 - `sdd-session-init.sh` -- 현재 프로젝트가 SDD를 사용하는지 자동 감지하고 단계/진행 상황을 표시
 - `sdd-lsp-patch.sh` -- gopls PATH 자동 패치 및 kotlin-lsp JVM 프리웜
 
+### Confluence 퍼블리싱 (`/claude-sdd:sdd-publish`)
+SDD 산출물을 Confluence에 자동 퍼블리싱합니다. `sdd-config.yaml`의 `publishing.confluence` 섹션이 활성화되면 동작합니다. 마크다운 → Confluence storage format 변환, 다이어그램 PNG 생성/첨부, 증분 동기화(타임스탬프 비교)를 지원합니다.
+
+**다이어그램 생성**: `scripts/sdd-generate-diagram.py`가 스펙에서 architecture, dependency, ER, interaction 다이어그램을 PNG로 생성합니다 (Graphviz DOT + Python diagrams 라이브러리).
+
+**첨부 업로드**: `scripts/sdd-confluence-upload.py`가 `atlassian-python-api`를 사용하여 PNG를 Confluence 페이지에 첨부합니다. MCP 도구는 첨부를 지원하지 않으므로 별도 스크립트가 필요합니다.
+
+**조건부 퍼블리싱**: `sdd-intake`, `sdd-spec`, `sdd-plan`, `sdd-review` 스킬은 단계 완료 후 `publishing.confluence.enabled: true`이면 해당 산출물을 즉시 퍼블리싱합니다.
+
+### 브랜치 관리
+`sdd-init`, `sdd-godmode`, `sdd-change` 스킬은 실행 시작 전에 현재 브랜치가 `feature/**` 패턴인지 확인합니다. 아닌 경우 Jira 소스에서 자동 생성하거나 사용자 입력을 받아 `feature/<name>` 브랜치를 생성합니다.
+
 ### CLI 유틸리티 (`lib/`)
 - `utils.mjs` -- 색상, 셸 실행, 프롬프트
-- `checker.mjs` -- 의존성 검사 로직
-- `installer.mjs` -- 설치 마법사
+- `checker.mjs` -- 의존성 검사 로직 (MCP, 다이어그램 도구 포함)
+- `installer.mjs` -- 설치 마법사 (MCP, 다이어그램 도구 설정 포함)
+- `uninstaller.mjs` -- 플러그인, MCP, 다이어그램 도구 일괄 제거
 - `doctor.mjs` -- 진단 및 파일 무결성 검증
 
 ## 주요 규칙

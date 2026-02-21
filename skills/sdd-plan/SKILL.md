@@ -287,6 +287,18 @@ description: 스펙을 워크 패키지로 분해합니다. 멀티 도메인 프
 다음 단계: /claude-sdd:sdd-assign [--domain=<id> | --all] — 팀 멤버 배정
 ```
 
+## 퍼블리싱 (조건부)
+
+`sdd-config.yaml`에서 `publishing.confluence.enabled: true`인 경우, 태스크 계획 생성 완료 후 자동으로 Confluence에 퍼블리싱합니다.
+
+1. `publishing` 설정을 확인합니다.
+2. `enabled: true`이면 `/claude-sdd:sdd-publish --stage=plan`와 동일한 로직으로 `07-task-plan.md`를 퍼블리싱합니다.
+3. 퍼블리싱 결과를 출력합니다:
+   ```
+   Confluence 퍼블리싱: 07-태스크 계획 ✓ https://company.atlassian.net/wiki/...
+   ```
+4. 퍼블리싱 실패 시 경고만 표시합니다.
+
 ## 의존성
 
 - `docs/specs/02-*.md`부터 `06-*.md` (`/claude-sdd:sdd-spec`에서 생성)

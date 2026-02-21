@@ -1,5 +1,23 @@
 # 변경 이력
 
+## [0.4.0] - 2026-02-21
+
+### 추가
+- **Confluence 퍼블리싱 (`sdd-publish`)**: SDD 산출물을 Confluence에 자동 퍼블리싱. 마크다운→Confluence storage format 변환, 다이어그램 PNG 생성/첨부, 증분 동기화 지원
+- **다이어그램 생성 (`sdd-generate-diagram.py`)**: 아키텍처, ER, 모듈 의존성, 컴포넌트 상호작용 다이어그램을 PNG로 자동 생성. graphviz + Python diagrams 지원
+- **Confluence 첨부 업로더 (`sdd-confluence-upload.py`)**: MCP 인증 정보를 재사용하여 atlassian-python-api로 PNG 첨부
+- **인스톨러 MCP 설정 (Step 5/7)**: Atlassian MCP (최대 2개 사이트, uvx 기반, SSL 2계층 분리) + Figma MCP (Remote/Desktop) 대화형 설정
+- **인스톨러 다이어그램 도구 (Step 6/7)**: Graphviz + Python diagrams + atlassian-python-api 설치
+- **확장된 언인스톨러 (`lib/uninstaller.mjs`)**: 플러그인, LSP, MCP 서버, 다이어그램 도구, 마켓플레이스, 설정값을 일괄 스캔/제거
+- **브랜치 관리**: `sdd-init`, `sdd-godmode`, `sdd-change` 실행 시 feature 브랜치 자동 확인/생성. Jira 키 기반 또는 사용자 입력
+- **기존 스킬 퍼블리싱 통합**: `sdd-intake`, `sdd-spec`, `sdd-plan`, `sdd-review` 완료 시 Confluence 자동 퍼블리싱 (조건부)
+
+### 변경
+- **인스톨러 단계 확장**: `[1/5]`~`[5/5]` → `[1/7]`~`[7/7]` (MCP 서버 + 다이어그램 도구 단계 추가)
+- **checker.mjs 구조화**: MCP 서버를 `~/.claude.json`에서 구조화하여 검사 (Atlassian 서버별 표시, Figma MCP 확인, 다이어그램 도구 확인)
+- **sdd-config.yaml 확장**: `project.branch` 필드 + `publishing.confluence` 섹션 추가
+- **언인스톨러 분리**: `lib/installer.mjs`에서 `lib/uninstaller.mjs`로 분리
+
 ## [0.3.3] - 2026-02-21
 
 ### 변경

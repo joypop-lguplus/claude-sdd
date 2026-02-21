@@ -8,7 +8,7 @@ claude-sdd는 스펙 주도 개발 (SDD) 라이프사이클을 구현하는 Clau
 
 1. **체크리스트 = 마크다운**: 모든 추적은 git으로 버전 관리되는 마크다운 파일에서 이루어지며, 사람과 Claude 모두 읽을 수 있습니다.
 2. **MCP 미번들**: Confluence/Jira MCP 서버를 번들하지 않습니다. 플러그인은 사용자의 기존 MCP 설정을 활용하도록 안내합니다.
-3. **12개의 독립 스킬**: 각 라이프사이클 단계가 별도의 스킬이므로, 어느 지점에서든 재진입이 가능합니다.
+3. **14개의 독립 스킬**: 각 라이프사이클 단계가 별도의 스킬이므로, 어느 지점에서든 재진입이 가능합니다.
 4. **에이전트 모델 = Sonnet**: 모든 에이전트는 실제 분석 및 구현 작업에 Sonnet을 사용합니다.
 5. **Figma = 비전**: 별도의 MCP 없이 스크린샷/URL을 통해 디자인을 분석합니다.
 
@@ -16,7 +16,7 @@ claude-sdd는 스펙 주도 개발 (SDD) 라이프사이클을 구현하는 Clau
 
 ```
 claude-sdd/
-├── Skills (13)        # 사용자용 슬래시 명령어
+├── Skills (14)        # 사용자용 슬래시 명령어
 │   ├── /claude-sdd:sdd-next      # 오케스트레이터 (단계 자동 감지)
 │   ├── /claude-sdd:sdd-godmode  # 심층 인터뷰 + 풀 오토 실행
 │   ├── /claude-sdd:sdd-init      # 프로젝트 초기화
@@ -28,6 +28,7 @@ claude-sdd/
 │   ├── /claude-sdd:sdd-review    # 품질 게이트
 │   ├── /claude-sdd:sdd-integrate # PR 및 문서화
 │   ├── /claude-sdd:sdd-change    # 변경 관리 (영향 분석 + 델타 빌드)
+│   ├── /claude-sdd:sdd-publish   # Confluence 퍼블리싱 + 다이어그램
 │   ├── /claude-sdd:sdd-status    # 대시보드
 │   └── /claude-sdd:sdd-lint      # 코드 분석 및 진단
 │
@@ -51,10 +52,11 @@ claude-sdd/
 │   ├── sdd-session-init.sh   # SDD 프로젝트 감지 + 진행 상황 표시
 │   └── sdd-lsp-patch.sh      # gopls PATH 패치 + kotlin-lsp JVM 프리웜
 │
-└── CLI (4 modules)    # npx CLI (설치용)
+└── CLI (5 modules)    # npx CLI (설치용)
     ├── cli.mjs        # 진입점
-    ├── checker.mjs    # 의존성 검사
-    ├── installer.mjs  # 설치 마법사
+    ├── checker.mjs    # 의존성 검사 (MCP, 다이어그램 포함)
+    ├── installer.mjs  # 설치 마법사 (MCP, 다이어그램 설정)
+    ├── uninstaller.mjs # 일괄 제거
     └── doctor.mjs     # 진단
 ```
 
@@ -192,6 +194,42 @@ Phase 7: PR 생성 (변경 추적성 포함)
 **레거시 갭 해소 옵션**:
 - `--from-analysis`: 분석 보고서(`10-analysis-report.md`)의 갭 항목에서 CR 자동 생성
 - `--lightweight --from-analysis`: 소규모 갭(5개 이하) 빠른 처리 — Phase 1-4 자동 설정, Phase 5(빌드)+6(검증)+7(PR)만 실행
+
+## Confluence 퍼블리싱 아키텍처
+
+`/claude-sdd:sdd-publish`는 SDD 산출물을 Confluence에 자동 퍼블리싱합니다:
+
+```
+sdd-config.yaml (publishing 설정)
+    |
+    v
+/claude-sdd:sdd-publish
+    |
+    |-- docs/specs/*.md 스캔
+    |-- 타임스탬프 비교 (파일 mtime vs config timestamps)
+    |
+    |-- 변경된 파일만:
+    |   |-- 마크다운 → Confluence storage format 변환
+    |   |-- 다이어그램 플레이스홀더 감지
+    |   |   |
+    |   |   v
+    |   |   scripts/sdd-generate-diagram.py
+    |   |       (architecture → diagrams 라이브러리)
+    |   |       (dependency/er/interaction → graphviz DOT)
+    |   |       → PNG 파일 생성
+    |   |
+    |   |-- MCP confluence_create_page / confluence_update_page
+    |   |-- scripts/sdd-confluence-upload.py
+    |   |       (atlassian-python-api → 첨부 업로드)
+    |   |
+    |   v
+    |-- sdd-config.yaml 업데이트 (timestamps, page_ids)
+    |
+    v
+결과 대시보드
+```
+
+**조건부 퍼블리싱**: `sdd-intake`, `sdd-spec`, `sdd-plan`, `sdd-review` 스킬은 단계 완료 시 `publishing.confluence.enabled: true`이면 해당 산출물을 즉시 퍼블리싱합니다.
 
 ## 품질 루프
 

@@ -14,6 +14,7 @@
 | 작업 중 세션 끊김 / 재개 | 자동 감지 재개 | [시나리오 6](#시나리오-6-작업이-중단되었을-때-재개) |
 | 특정 단계만 다시 실행 | 단계 재진입 | [시나리오 7](#시나리오-7-특정-단계만-다시-실행) |
 | 코드 품질 점검만 필요 | 린트 | [시나리오 8](#시나리오-8-코드-품질-점검만-필요) |
+| 산출물을 Confluence에 퍼블리싱 | 퍼블리싱 | [시나리오 10](#시나리오-10-confluence-퍼블리싱) |
 | 진행 상황 확인 | 상태 대시보드 | [시나리오 9](#시나리오-9-진행-상황-확인) |
 
 ---
@@ -412,6 +413,54 @@ SDD 상태 대시보드
 /claude-sdd:sdd-status                       # 전체 프로젝트 개요
 /claude-sdd:sdd-status --domain=device-mgmt  # 특정 도메인 상세
 ```
+
+---
+
+## 시나리오 10: Confluence 퍼블리싱
+
+**상황**: SDD 산출물을 Confluence에 자동으로 퍼블리싱하고 싶습니다.
+
+### 사전 설정
+
+인스톨러에서 Atlassian MCP와 다이어그램 도구를 설치합니다:
+
+```bash
+npx github:joypop-lguplus/claude-sdd install
+# → MCP 서버 설정 (Atlassian) + 다이어그램 도구 설치
+```
+
+프로젝트 초기화 시 Confluence 퍼블리싱을 활성화합니다:
+
+```bash
+/claude-sdd:sdd-init new
+# → "Confluence에 퍼블리싱하시겠습니까?" 질문에 y
+# → MCP 서버, 스페이스 키, 루트 페이지 설정
+```
+
+### 수동 퍼블리싱
+
+```bash
+# 전체 산출물 퍼블리싱
+/claude-sdd:sdd-publish
+
+# 특정 단계만
+/claude-sdd:sdd-publish --stage=spec
+
+# 특정 도메인만
+/claude-sdd:sdd-publish --domain=device-mgmt
+```
+
+### 자동 퍼블리싱
+
+`publishing.confluence.enabled: true`이면, `sdd-intake`, `sdd-spec`, `sdd-plan`, `sdd-review` 완료 시 해당 산출물이 자동으로 퍼블리싱됩니다.
+
+### 다이어그램
+
+스펙에서 다이어그램이 감지되면 PNG로 자동 생성하여 Confluence 페이지에 첨부합니다:
+- **architecture**: 시스템 구성도 (Python diagrams 라이브러리)
+- **dependency**: 모듈 의존성 (Graphviz DOT)
+- **er**: 엔티티 관계도 (Graphviz DOT)
+- **interaction**: 컴포넌트 상호작용 (Graphviz DOT)
 
 ---
 

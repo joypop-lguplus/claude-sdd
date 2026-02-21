@@ -136,6 +136,20 @@ Phase 5로 진행합니다 — TDD 델타 빌드...
 
 ---
 
+## Phase 0: 브랜치 확인 및 생성
+
+변경 관리 시작 전에 현재 Git 브랜치를 확인합니다.
+
+1. `git branch --show-current`로 현재 브랜치를 확인합니다.
+2. 브랜치가 `feature/`로 시작하면 **건너뜁니다**.
+3. `feature/`가 아닌 경우:
+   a. Jira 소스가 설정된 경우: `feature/CR-<N>-<jira-key>` (예: `feature/CR-001-DEV-200`)
+   b. Jira 소스가 없는 경우: `feature/change-CR-<N>` 또는 사용자 입력
+4. `git checkout -b feature/<name>` 실행
+5. `sdd-config.yaml`의 `project.branch`를 업데이트합니다.
+
+---
+
 ## Phase 1: 변경 요청 수집
 
 사용자와 대화하여 변경 요청 정보를 수집합니다.

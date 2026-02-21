@@ -3,7 +3,7 @@
   "plugin": {
     "name": "claude-sdd",
     "display_name": "claude-sdd",
-    "version": "0.3.3",
+    "version": "0.4.0",
     "description": "Spec-Driven Development lifecycle with Claude Code Agent Teams. Manages the full development lifecycle from requirements gathering through implementation, quality verification, and integration.",
     "short_description": "SDD lifecycle management with Agent Teams",
     "repository": "https://github.com/joypop-lguplus/claude-sdd",
@@ -88,6 +88,10 @@
         {
           "name": "sdd-status",
           "description": "Status dashboard with progress tracking"
+        },
+        {
+          "name": "sdd-publish",
+          "description": "Publish SDD artifacts to Confluence with diagram PNG attachments"
         },
         {
           "name": "sdd-lint",
