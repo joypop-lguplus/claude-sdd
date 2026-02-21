@@ -126,3 +126,16 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 - **ESM 전용** -- 모든 `.mjs` 파일은 ES 모듈 import를 사용합니다.
 - **외부 의존성 없음** -- 플러그인은 Node.js 내장 모듈과 셸 명령어만 사용합니다.
 - **버전은 네 곳에서 업데이트 필수**: `package.json`, `.claude-plugin/plugin.json`, `marketplace.json`, `bin/cli.mjs`.
+- **문서 현행화 필수** -- 코드/스킬/에이전트/템플릿 변경 시, **커밋 전에 반드시** 아래 매핑에 따라 관련 문서를 함께 갱신합니다. 문서가 갱신되지 않은 변경은 커밋하지 않습니다.
+
+### 변경-문서 매핑
+
+| 변경 대상 | 함께 갱신할 문서 |
+|-----------|-----------------|
+| `skills/*.md` | `CLAUDE.md`, `docs/usage-guide.md`, `docs/workflow-guide.md` |
+| `agents/*.md` | `CLAUDE.md`, `docs/architecture.md` |
+| `templates/*.tmpl` | `CLAUDE.md`, `docs/architecture.md` |
+| 워크플로우/라이프사이클 변경 | `docs/workflow-guide.md`, `docs/sdd-methodology.md` |
+| 아키텍처/구조 변경 | `docs/architecture.md` |
+| 신규 기능/모드/용어 추가 | `README.md`, `README.en.md`, `CHANGELOG.md`, `docs/glossary-ko.md` |
+| CLI 명령어 변경 | `CLAUDE.md`, `README.md`, `README.en.md` |
