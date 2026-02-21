@@ -43,6 +43,15 @@ description: 스펙을 워크 패키지로 분해하고 Agent Teams에 할당합
 3. **작업량 균형**: 각 패키지의 크기가 대략 비슷해야 합니다.
 4. **병렬성 극대화**: 독립적인 패키지는 동시에 실행해야 합니다.
 
+#### 레거시 프로젝트 추가 고려사항
+
+`sdd-config.yaml`의 `project.type`이 `legacy`인 경우, 태스크 분해에 다음을 추가로 적용합니다:
+
+1. **감사 대상 기존 코드 경로 명시**: 각 워크 패키지에 감사해야 할 기존 소스 파일/디렉토리 경로를 명시합니다.
+2. **스펙 변경 영향도 기준 우선순위**: 기존 코드에 대한 변경 영향이 큰 항목을 먼저 처리하도록 정렬합니다.
+3. **하위 호환성 검증 태스크 포함**: 각 워크 패키지에 기존 API/인터페이스 보존을 확인하는 검증 태스크를 포함합니다.
+4. **기존 테스트 회귀 검증 태스크 포함**: 기존 테스트가 여전히 통과하는지 확인하는 태스크를 포함합니다.
+
 ### 워크 패키지 형식
 
 ```markdown
@@ -55,6 +64,27 @@ description: 스펙을 워크 패키지로 분해하고 Agent Teams에 할당합
 - [ ] TASK-001: User 엔티티 생성 (스펙: 04-data-model.md#user)
 - [ ] TASK-002: User CRUD API (스펙: 03-api-spec.md#user-endpoints)
 - [ ] TASK-003: User API 테스트 (스펙: 06-spec-checklist.md#TEST-001)
+
+### 의존성
+- 없음 (즉시 시작 가능)
+```
+
+### 워크 패키지 형식 (레거시 프로젝트)
+
+`project.type: legacy`인 경우, 워크 패키지에 `기존 코드 참조` 필드를 추가합니다:
+
+```markdown
+## 워크 패키지 WP-1: [모듈 이름] (팀 멤버 1)
+
+**스펙 섹션**: 03-api-changes.md#user-endpoints, 04-data-migration.md#user
+**체크리스트 항목**: CHG-001, CHG-002, CHG-REG-001
+**기존 코드 참조**: `src/user/controller.ts`, `src/user/model.ts`, `src/user/routes.ts`
+
+### 태스크
+- [ ] TASK-001: User 모듈 기존 코드 감사 (기존 코드: src/user/)
+- [ ] TASK-002: User API 변경 사항 보완 (스펙: 03-api-changes.md#user-endpoints)
+- [ ] TASK-003: 하위 호환성 검증 (기존 API 보존 확인)
+- [ ] TASK-004: 기존 테스트 회귀 검증 + 새 테스트 추가
 
 ### 의존성
 - 없음 (즉시 시작 가능)

@@ -28,10 +28,11 @@ description: Agent Teams로 워크 패키지를 구현합니다. 품질 루프(�
 1. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`이 활성화되어야 함
 2. `docs/specs/sdd-config.yaml`을 읽어 프로젝트 설정을 확인합니다.
 3. **TDD 모드 감지**: `--tdd` 플래그가 있거나 `sdd-config.yaml`의 `teams.tdd: true`이면 TDD 모드를 활성화합니다.
-4. **도메인 모드 감지**: `domains` 키 존재 여부로 단일/멀티 도메인 모드를 결정합니다:
+4. **레거시 모드 감지**: `sdd-config.yaml`의 `project.type`이 `legacy`이면 레거시 모드를 활성화합니다.
+5. **도메인 모드 감지**: `domains` 키 존재 여부로 단일/멀티 도메인 모드를 결정합니다:
    - `domains` 없음 또는 빈 배열 → **단일 도메인 모드** (기존 동작)
    - `domains` 존재 → **멀티 도메인 모드**
-4. 태스크 계획 존재 확인:
+6. 태스크 계획 존재 확인:
    - 단일 도메인: `docs/specs/07-task-plan.md` 및 `docs/specs/06-spec-checklist.md`
    - 멀티 도메인: `docs/specs/domains/<domain-id>/07-task-plan.md` 및 `docs/specs/domains/<domain-id>/06-spec-checklist.md`
 
@@ -187,6 +188,99 @@ TDD 재작업 사이클 1/3:
 ```
 
 3회 재작업 후에도 실패 → 기존 에스컬레이션 프로세스와 동일하게 사용자에게 보고합니다.
+
+---
+
+## 레거시 모드 빌드 루프
+
+`sdd-config.yaml`의 `project.type`이 `legacy`인 경우, 각 워크 패키지에 대해 기존 빌드 루프 대신 **Phase 1/2/3 감사-보완 빌드 루프**를 실행합니다.
+
+**레거시 모드에서도 같은 단계의 워크 패키지는 병렬로 실행합니다.**
+
+### 레거시 Phase 1 (Audit): 기존 코드 감사 — 병렬
+
+같은 단계의 모든 WP에 대해 `sdd-implementer` 팀 멤버를 **동시에** 생성하되, 레거시 모드 프롬프트를 사용합니다:
+
+```
+Task(team_name="sdd-build", name="wp-1", model="sonnet",
+     prompt="당신은 sdd-implementer입니다. 레거시 모드입니다.
+             Phase 1 (Audit): 기존 코드와 스펙을 대조하세요.
+             이미 스펙을 충족하는 항목은 [x]로 표시하고, 미충족 항목은 [ ]로 남기세요.
+             새 코드를 작성하지 마세요. 감사만 수행하세요. ...")
+Task(team_name="sdd-build", name="wp-2", model="sonnet",
+     prompt="당신은 sdd-implementer입니다. 레거시 모드입니다. ...")
+```
+
+모든 감사가 완료되면:
+- 각 멤버의 감사 보고서를 확인합니다.
+- 이미 충족된 항목(`[x]`)과 미충족 항목(`[ ]`)을 집계합니다.
+- 모든 항목이 이미 충족된 WP는 Phase 2를 건너뜁니다.
+
+```
+레거시 Phase 1 — 감사 결과:
+  WP-1: 8개 항목 중 5개 충족 (audit), 3개 미충족 (gap)
+  WP-2: 6개 항목 중 6개 충족 (audit) → Phase 2 건너뜀
+  WP-3: 10개 항목 중 7개 충족 (audit), 3개 미충족 (gap)
+  Phase 2 대상: WP-1, WP-3
+```
+
+### 레거시 Phase 2 (Gap-fill): 미충족 항목 보완 — 병렬
+
+미충족 항목이 있는 WP에 대해 `sdd-implementer` 팀 멤버에게 보완을 지시합니다:
+
+```
+SendMessage(recipient="wp-1", content="레거시 Phase 2 (Gap-fill):
+  다음 미충족 항목만 최소한으로 수정/추가하세요:
+  - API-003: 422 에러 핸들러 누락
+  - SEC-001: 입력 유효성 검사 미충족
+  - TEST-004: 에러 핸들러 테스트 누락
+  기존 코드 구조를 보존하고, 하위 호환성을 유지하세요.")
+```
+
+### 레거시 Phase 3 (Verify): 기존 테스트 + 새 테스트 검증
+
+1. **기존 테스트 실행**: `sdd-config.yaml`의 `test.command`로 기존 테스트가 여전히 통과하는지 확인합니다.
+2. **결과 판정**:
+   - 기존 테스트 모두 통과 + 미충족 항목 보완 완료 → 워크 패키지 완료
+   - 기존 테스트 실패 → 해당 멤버에게 재작업 (하위 호환성 파괴 수정)
+   - 미충족 항목 남음 → 해당 멤버에게 재작업 (gap-fill 재시도)
+
+```
+레거시 Phase 3 — 검증 결과:
+  WP-1:
+    기존 테스트: 12/12 통과 ✓
+    새 테스트: 3/3 통과 ✓
+    미충족 항목: 0개 → 완료
+  WP-3:
+    기존 테스트: 8/8 통과 ✓
+    새 테스트: 2/3 실패 → Phase 2 재작업
+```
+
+### 레거시 재작업 사이클
+
+Phase 3에서 실패 시 Phase 2+3를 반복합니다 (최대 3회). 3회 재작업 후에도 실패 → 기존 에스컬레이션 프로세스와 동일하게 사용자에게 보고합니다.
+
+### 레거시 모드 팀 멤버 프롬프트 구성
+
+팀 멤버 프롬프트 구성 시 다음을 추가합니다:
+
+1. `agents/sdd-implementer.md`의 **레거시 모드** 섹션이 포함되도록 합니다.
+2. `templates/claude-md/sdd-member.md.tmpl`의 `{{LEGACY_MODE}}` 변수를 `true`로 설정합니다.
+3. 워크 패키지 컨텍스트에 **감사 대상 기존 코드 경로**를 포함합니다.
+
+### 레거시 모드 완료 보고
+
+```
+빌드 단계 완료! (레거시 모드)
+
+모든 워크 패키지: 4/4 완료
+  감사 통과 (audit passed): 18개 항목 — 기존 코드가 스펙 충족
+  보완 완료 (gap-filled): 10개 항목 — 최소 수정으로 스펙 충족
+체크리스트 진행률: 28/28 항목 완료 (100%)
+기존 테스트: 45/45 통과 (하위 호환성 유지 ✓)
+
+다음 단계: /claude-sdd:sdd-review — 품질 게이트 검증 실행
+```
 
 ---
 
