@@ -3,6 +3,13 @@
 ## [Unreleased]
 
 ### Added
+- **솔로 모드** — Agent Teams 없이도 빌드 가능
+  - Agent Teams 비활성화 시 솔로 모드(순차 빌드)로 자동 전환
+  - 현재 세션이 `agents/sdd-implementer.md` 등 에이전트 규칙을 읽고 직접 구현
+  - 팀 모드와 동일한 결과물(코드, 테스트, 체크리스트) 및 동일한 품질 루프(최대 3회 재작업)
+  - `sdd-build`(팀/솔로 분기), `sdd-change` Phase 2/5/6(팀/솔로 분기) 지원
+  - `checker.mjs`에서 Agent Teams를 필수 → 선택(권장)으로 변경
+  - `sdd-leader.md.tmpl`에 실행 모드 안내 섹션 추가
 - **프로젝트 규칙(Project Rules) 시스템** — 코딩 규칙의 체계적 정의/전파/검증
   - 규칙 4필드 구조: 원칙 / 위반 기준 / 검증 방법 / 예외
   - 언어별 프리셋: Java+Spring, TypeScript+Node, Python+FastAPI, Kotlin+Spring, Go

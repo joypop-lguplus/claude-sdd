@@ -67,7 +67,7 @@ description: >-
 
 멤버 설정: docs/specs/wp-*-member.md
 
-다음 단계: /claude-sdd:sdd-build — Agent Teams를 통한 구현 시작
+다음 단계: /claude-sdd:sdd-build — 구현 시작 (Agent Teams 활성화 시 팀 모드, 비활성화 시 솔로 모드)
 ```
 
 ---

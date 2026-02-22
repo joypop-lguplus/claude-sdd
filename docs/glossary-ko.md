@@ -15,6 +15,8 @@
 | Skill | 스킬 | |
 | Agent | 에이전트 | |
 | Agent Teams | Agent Teams | Claude 기능명이므로 영어 유지 |
+| Team Mode | 팀 모드 | Agent Teams 활성화 시 워크 패키지를 병렬로 실행하는 빌드 모드 |
+| Solo Mode | 솔로 모드 | Agent Teams 비활성화 시 현재 세션이 워크 패키지를 순차적으로 직접 구현하는 빌드 모드. 팀 모드와 동일한 결과물/품질 루프 |
 | Plugin | 플러그인 | |
 | Slash command | 슬래시 커맨드 | |
 

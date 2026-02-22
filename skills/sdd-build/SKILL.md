@@ -1,13 +1,13 @@
 ---
 name: sdd-build
 description: >-
-  Agent Teams로 워크 패키지를 구현합니다. 품질 루프(최대 3회 재작업)를 통해 스펙 준수를 보장합니다. 멀티 도메인 프로젝트에서는 도메인별/통합 빌드를 지원합니다.
+  워크 패키지를 구현합니다. Agent Teams 활성화 시 병렬 빌드(팀 모드), 비활성화 시 순차 빌드(솔로 모드). 품질 루프(최대 3회 재작업)를 통해 스펙 준수를 보장합니다. 멀티 도메인 프로젝트에서는 도메인별/통합 빌드를 지원합니다.
   Use when: "구현해줘", "빌드 시작", "코드 작성", "build", "implement", "개발 시작"
 ---
 
-# /claude-sdd:sdd-build — Agent Teams를 통한 구현
+# /claude-sdd:sdd-build — 워크 패키지 구현
 
-리더 주도의 품질 루프를 갖춘 Claude Code Agent Teams를 사용하여 워크 패키지를 실행합니다.
+품질 루프를 갖춘 워크 패키지 실행. Agent Teams 활성화 시 **팀 모드**(병렬 빌드), 비활성화 시 **솔로 모드**(순차 빌드)로 자동 전환됩니다.
 
 ## 사용법
 
@@ -27,7 +27,9 @@ description: >-
 
 ## 사전 조건
 
-1. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`이 활성화되어야 함
+1. **실행 모드 감지**: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 환경 변수 또는 `~/.claude/settings.json`의 `env` 설정을 확인합니다.
+   - **활성화** → **팀 모드** (Agent Teams 병렬 빌드)
+   - **비활성화** → **솔로 모드** (현재 세션에서 순차 빌드)
 2. `docs/specs/sdd-config.yaml`을 읽어 프로젝트 설정을 확인합니다.
 3. **모델 설정 읽기**: `sdd-config.yaml`의 `teams` 섹션에서 모델을 결정합니다:
    - `teams.model` (기본: `"sonnet"`) — 구현, 테스트, 리뷰 등 사고가 필요한 작업
@@ -43,7 +45,9 @@ description: >-
 
 ---
 
-## 핵심 메커니즘: Agent Teams 병렬 빌드 + 품질 루프
+## 핵심 메커니즘: 팀 모드 — Agent Teams 병렬 빌드 + 품질 루프
+
+> **이 섹션은 Agent Teams가 활성화된 팀 모드에 해당합니다.** 솔로 모드는 아래 [솔로 모드](#솔로-모드-순차-빌드--품질-루프) 섹션을 참조하세요.
 
 **중요: 같은 단계(stage)의 워크 패키지는 반드시 병렬로 실행합니다.**
 
@@ -109,6 +113,81 @@ Stage 2 (순차, Stage 1 완료 후):
   [완료 대기]
 
 체크리스트 검증 → 완료
+```
+
+---
+
+## 솔로 모드: 순차 빌드 + 품질 루프
+
+> **이 섹션은 Agent Teams가 비활성화된 솔로 모드에 해당합니다.** 현재 세션이 직접 각 워크 패키지를 순차적으로 구현합니다.
+
+**원칙: 팀 모드와 동일한 결과물(코드, 테스트, 체크리스트), 다른 실행 모델.**
+
+```
+현재 세션 (솔로):
+  1. 태스크 계획 읽기 (07-task-plan.md)
+     - 워크 패키지를 실행 단계(stage)별로 그룹화
+     - 예: Stage 1 = [WP-1, WP-2, WP-3], Stage 2 = [WP-4]
+
+  2. 각 워크 패키지를 순차적으로 처리:
+
+     a. agents/sdd-implementer.md를 Read 도구로 읽고 해당 규칙을 따름
+     b. wp-N-member.md (있으면)를 컨텍스트로 활용
+     c. 스펙 참조 (02~05 스펙 문서)를 확인하며 구현
+     d. 체크리스트 항목(06-spec-checklist.md)을 하나씩 충족시키며 [x] 표시
+
+  3. 각 WP 완료 후 체크리스트 검증 (팀 모드와 동일):
+     - 06-spec-checklist.md 읽기
+     - 배정된 각 항목에 대해:
+       - [x]로 표시되었는가?
+       - 코드가 실제로 존재하는가?
+     - [ ] 항목이 남아있으면 → 직접 재구현 (최대 3회)
+     - 모두 [x]이면 → 다음 WP로 진행
+
+  4. 모든 WP 완료 후 → 다음 단계로
+
+재작업 사이클 (솔로):
+  미완료 항목을 식별하고 직접 재구현합니다.
+  재작업 시 구체적인 누락 사항을 기록:
+  "항목 API-003: UserController에 422 에러 핸들러 구현 필요"
+  → 직접 해당 코드를 수정하고 체크리스트 갱신
+
+  워크 패키지당 최대 3회 재작업 사이클.
+  3회 후 → 사용자에게 에스컬레이션.
+```
+
+### 솔로 TDD 빌드 루프
+
+TDD 모드에서 솔로 모드는 각 WP에 대해 순차적으로 Phase A→B→C를 실행합니다:
+
+```
+솔로 TDD 루프 (각 WP에 대해):
+  Phase A (Red):
+    - agents/sdd-test-writer.md를 읽고 규칙을 따름
+    - 스펙 기반 실패 테스트 작성
+    - test.command로 모두 실패하는지 확인
+
+  Phase B (Green):
+    - agents/sdd-implementer.md를 읽고 TDD 규칙을 따름
+    - 테스트 통과 코드 작성 (테스트 파일 수정 금지)
+
+  Phase C (Verify):
+    - test.command로 전체 테스트 실행
+    - 통과 → 다음 WP
+    - 실패 → Phase B+C 반복 (최대 3회)
+```
+
+### 솔로 레거시 분석 모드
+
+레거시 모드에서 솔로 모드는 각 WP에 대해 순차적으로 분석을 수행합니다:
+
+```
+솔로 레거시 분석 (각 WP에 대해):
+  - agents/sdd-implementer.md의 레거시 분석 전용 모드 섹션을 읽고 규칙을 따름
+  - 기존 코드와 스펙을 대조
+  - 충족 항목은 [x], 미충족 항목은 갭으로 식별
+  - 코드 수정 없이 분석만 수행
+  → 모든 WP 분석 완료 후 10-analysis-report.md 생성
 ```
 
 ---
@@ -327,7 +406,9 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
 - 실행 단계 (병렬 vs 순차)
 - 현재 진행 상황 (완료된 WP 확인)
 
-### 2단계: 팀 생성 및 병렬 워크 패키지 실행
+### 2단계: 워크 패키지 실행
+
+#### 2단계-팀 (Agent Teams 활성화 시)
 
 현재 실행 단계(stage)의 모든 워크 패키지를 **동시에** 실행합니다.
 
@@ -375,28 +456,44 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
    - 팀 멤버가 완료 보고를 보내면 해당 태스크를 `TaskUpdate`로 completed 처리
    - 문제 보고를 받으면 기록
 
+#### 2단계-솔로 (Agent Teams 비활성화 시)
+
+현재 실행 단계(stage)의 워크 패키지를 **순차적으로** 실행합니다.
+
+1. **에이전트 규칙 로드**: `agents/sdd-implementer.md`를 Read 도구로 읽고 해당 규칙을 따릅니다.
+   (TDD Phase A: `agents/sdd-test-writer.md` 사용)
+
+2. **각 워크 패키지를 순차 처리**:
+   - `wp-N-member.md` (있으면)를 읽어 컨텍스트로 활용
+   - 스펙 참조 파일(02~05)을 읽어 요구사항 파악
+   - 체크리스트 항목(06-spec-checklist.md)에서 이 WP에 배정된 항목을 식별
+   - 프로젝트 규칙 (규칙 활성화 시) 참조
+   - 각 항목을 구현하고 `[x]`로 표시
+
+3. **각 WP 완료 후** 다음 WP로 진행
+
 ### 3단계: 품질 검증 루프
 
-**모든 병렬 워크 패키지가 완료된 후** 체크리스트를 일괄 검증합니다:
+**모든 워크 패키지가 완료된 후** 체크리스트를 일괄 검증합니다:
 
 1. `docs/specs/06-spec-checklist.md` 읽기
 2. 각 워크 패키지별 배정된 체크리스트 항목 확인
 3. 여전히 `[ ]`인 항목에 대해:
    - 누락된 사항 식별
-   - 해당 WP 담당 팀 멤버에게 `SendMessage`로 구체적인 재작업 지시 전달
-   - 여러 팀 멤버에게 재작업이 필요하면 **동시에 메시지 전송**
+   - **팀 모드**: 해당 WP 담당 팀 멤버에게 `SendMessage`로 구체적인 재작업 지시 전달. 여러 팀 멤버에게 재작업이 필요하면 **동시에 메시지 전송**
+   - **솔로 모드**: 미완료 항목을 직접 재구현. 구체적인 누락 사항을 확인하고 해당 코드를 수정
 
 ```
 재작업 사이클 1/3:
   WP-1 미완료 항목:
   - API-003: UserController에 422 에러 핸들러 누락
+
+  [팀 모드]
   → SendMessage(recipient="wp-1", content="API-003: 422 에러 핸들러를 추가하세요...")
-
-  WP-2 미완료 항목:
-  - DM-005: User 모델에 email 유효성 검사 미구현
-  → SendMessage(recipient="wp-2", content="DM-005: email 유효성 검사를 구현하세요...")
-
   [재작업 완료 대기]
+
+  [솔로 모드]
+  → 직접 해당 코드를 수정하고 체크리스트 갱신
 ```
 
 #### 규칙 준수 검증 (규칙 활성화 시)
@@ -454,13 +551,19 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
 
 이 단계는 권장 사항이지만 필수는 아닙니다. `/claude-sdd:sdd-review` 품질 게이트에서 나머지 문제를 잡아냅니다.
 
-### 4단계: 단계 전환 및 팀 정리
+### 4단계: 단계 전환
 
 한 단계의 모든 워크 패키지가 완료되면:
+
+**팀 모드:**
 1. 현재 팀 멤버에게 `SendMessage(type="shutdown_request")`로 종료 요청
 2. 모든 멤버 종료 확인 후 `TeamDelete`로 팀 리소스 정리
 3. 다음 실행 단계로 이동 (새 `TeamCreate` + 새 멤버 생성)
 4. 모든 단계가 완료된 경우 완료 보고
+
+**솔로 모드:**
+1. 즉시 다음 실행 단계로 이동 (다음 stage의 WP를 순차 처리)
+2. 모든 단계가 완료된 경우 완료 보고
 
 ```
 빌드 단계 완료!
@@ -509,9 +612,9 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
 1. `docs/specs/domains/<id>/07-task-plan.md`를 읽어 워크 패키지를 파싱합니다.
 2. `docs/specs/domains/<id>/06-spec-checklist.md`를 읽어 체크리스트를 확인합니다.
 
-3. **팀 생성 및 병렬 워크 패키지 실행**: 단일 도메인 모드와 동일한 병렬 패턴을 사용합니다.
-   - `TeamCreate`로 팀 생성 (team_name: `"sdd-build-<domain-id>"`)
-   - 같은 실행 단계의 모든 WP를 `Task` 도구로 **동시에** 생성:
+3. **워크 패키지 실행**: 실행 모드에 따라 분기합니다.
+   - **팀 모드**: `TeamCreate`로 팀 생성 (team_name: `"sdd-build-<domain-id>"`), 같은 실행 단계의 모든 WP를 `Task` 도구로 **동시에** 생성
+   - **솔로 모드**: 각 WP를 순차적으로 처리 (단일 도메인 솔로 모드와 동일한 패턴)
      ```
      Task(team_name="sdd-build-device-mgmt", name="dev-wp-1",
           subagent_type="general-purpose", model="sonnet",
@@ -618,5 +721,5 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
 - `docs/specs/07-task-plan.md` 또는 `docs/specs/domains/<id>/07-task-plan.md` (`/claude-sdd:sdd-plan`에서 생성)
 - `docs/specs/06-spec-checklist.md` 또는 `docs/specs/domains/<id>/06-spec-checklist.md` (`/claude-sdd:sdd-spec`에서 생성)
 - `docs/specs/sdd-config.yaml` (`/claude-sdd:sdd-init`에서 생성)
-- Agent Teams 활성화 (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)
+- Agent Teams 활성화 시 병렬 빌드(팀 모드), 비활성화 시 순차 빌드(솔로 모드)
 - 통합 빌드: `docs/specs/cross-domain/integration-points.md`, `docs/specs/cross-domain/integration-checklist.md`

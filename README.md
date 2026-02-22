@@ -174,7 +174,7 @@ init → intake → spec → plan → assign → build(분석 전용) → change
 |-----------|----------|------|
 | Claude Code | **필수** | 플러그인 호스트 |
 | Node.js 18+ | **필수** | CLI 도구용 |
-| Agent Teams | **필수** | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
+| Agent Teams | 권장 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` — 활성화 시 팀 모드(병렬), 비활성화 시 솔로 모드(순차) |
 | `gh` CLI | 권장 | PR 생성용 |
 | ast-grep (`sg`) | 선택 | `/claude-sdd:sdd-lint search` 및 `/claude-sdd:sdd-lint symbols`용 |
 | mmdc (Mermaid CLI) | 선택 | 다이어그램 PNG 렌더링용. `npm i -g @mermaid-js/mermaid-cli` |
@@ -183,7 +183,9 @@ init → intake → spec → plan → assign → build(분석 전용) → change
 | Confluence MCP | 선택 | `/claude-sdd:sdd-intake confluence:...`용 |
 | Jira MCP | 선택 | `/claude-sdd:sdd-intake jira:...`용 |
 
-### Agent Teams 활성화
+### Agent Teams 활성화 (권장)
+
+Agent Teams를 활성화하면 워크 패키지를 병렬로 빌드하여 더 빠르게 진행합니다. 비활성화 시 솔로 모드로 순차 빌드합니다.
 
 ```json
 // ~/.claude/settings.json

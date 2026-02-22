@@ -101,9 +101,20 @@ claude-sdd/
                        --> TDD 델타 빌드 → 리뷰 → PR
 ```
 
-## Agent Teams 아키텍처
+## 실행 모드
 
-`/claude-sdd:sdd-build` 단계에서 플러그인은 Claude Code Agent Teams를 사용합니다:
+`/claude-sdd:sdd-build`와 `/claude-sdd:sdd-change`는 Agent Teams 활성화 여부에 따라 자동으로 실행 모드를 결정합니다:
+
+| 모드 | 조건 | 실행 방식 | 결과물 |
+|------|------|----------|--------|
+| **팀 모드** | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` | 같은 stage의 WP를 병렬로 실행 (TeamCreate + Task) | 동일 |
+| **솔로 모드** | Agent Teams 비활성화 | 현재 세션이 WP를 순차 처리 (에이전트 .md를 읽고 직접 실행) | 동일 |
+
+두 모드 모두 **동일한 품질 루프**(체크리스트 검증 + 최대 3회 재작업 + 에스컬레이션)를 적용합니다.
+
+## Agent Teams 아키텍처 (팀 모드)
+
+Agent Teams가 활성화된 경우, `/claude-sdd:sdd-build` 단계에서 플러그인은 Claude Code Agent Teams를 사용합니다:
 
 ```
 리더 세션 (Opus)
@@ -120,6 +131,27 @@ claude-sdd/
   |
   |-- 순차 단계 실행
   |-- ...
+```
+
+## 솔로 모드 아키텍처
+
+Agent Teams가 비활성화된 경우, 현재 세션이 직접 워크 패키지를 순차 처리합니다:
+
+```
+현재 세션 (Opus)
+  |
+  |-- agents/sdd-implementer.md 읽기 (규칙 로드)
+  |
+  |-- WP-1: User 모듈 구현
+  |   |-- 체크리스트 검증 → [x] 또는 재구현
+  |
+  |-- WP-2: Auth 모듈 구현
+  |   |-- 체크리스트 검증 → [x] 또는 재구현
+  |
+  |-- WP-3: Payment 모듈 구현
+  |   |-- 체크리스트 검증 → [x] 또는 재구현
+  |
+  |-- 모든 WP 완료 → 다음 단계
 ```
 
 ## 코드 분석 레이어

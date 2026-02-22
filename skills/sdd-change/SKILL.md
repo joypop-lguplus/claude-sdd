@@ -190,14 +190,20 @@ Phase 2로 진행합니다 — 영향 분석...
 
 ## Phase 2: 영향 분석
 
-`sdd-change-analyst` 에이전트를 사용하여 변경 요청의 영향을 분석합니다.
+`sdd-change-analyst` 에이전트의 규칙을 사용하여 변경 요청의 영향을 분석합니다.
 
 ### 에이전트 실행
 
+**팀 모드** (Agent Teams 활성화):
 1. **`sdd-change-analyst` 에이전트로 팀 멤버 생성**:
    - 에이전트: `sdd-change-analyst`
    - 컨텍스트: `09-change-request.md`, 기존 스펙 문서 전체 (02~05, 06-checklist)
    - 지시: "변경 요청을 분석하고 영향 범위를 식별하세요."
+
+**솔로 모드** (Agent Teams 비활성화):
+1. **`agents/sdd-change-analyst.md`를 Read 도구로 읽고** 해당 규칙을 따라 직접 분석합니다.
+   - `09-change-request.md`와 기존 스펙 문서 전체 (02~05, 06-checklist)를 참조
+   - LSP 도구(findReferences, incomingCalls)를 활용하여 영향 범위를 식별
 
 2. **분석 결과 수집**:
    - 직접 영향 / 간접 영향 / 회귀 위험 항목
@@ -349,6 +355,10 @@ Phase 5로 진행합니다 — TDD 델타 빌드...
 
 변경 워크 패키지를 **TDD 모드**로 빌드합니다. 이 단계는 `/claude-sdd:sdd-build --tdd`의 Phase A/B/C 루프를 사용합니다.
 
+**실행 모드에 따른 분기:**
+- **팀 모드**: 각 CWP에 대해 `sdd-test-writer`, `sdd-implementer` 팀 멤버를 생성하여 병렬 빌드
+- **솔로 모드**: 각 CWP에 대해 순차적으로 Phase A→B→C를 실행. `agents/sdd-test-writer.md`와 `agents/sdd-implementer.md`를 읽고 해당 규칙을 따라 직접 테스트 작성 및 구현
+
 ### 레거시 갭 해소 빌드 규칙
 
 레거시 프로젝트의 갭 해소 CR인 경우 (`gap_source: 10-analysis-report.md`), Phase 5에서 다음 추가 규칙을 적용합니다:
@@ -411,7 +421,10 @@ Phase 6으로 진행합니다 — 리뷰 + 회귀 검증...
 
 ## Phase 6: 리뷰 + 회귀 검증
 
-`sdd-reviewer` 에이전트를 사용하여 변경 항목과 회귀 방지를 검증합니다.
+변경 항목과 회귀 방지를 검증합니다.
+
+- **팀 모드**: `sdd-reviewer` 에이전트로 팀 멤버를 생성하여 검증
+- **솔로 모드**: `agents/sdd-reviewer.md`를 Read 도구로 읽고 해당 규칙을 따라 직접 리뷰
 
 ### 검증 범위
 
@@ -605,7 +618,7 @@ Phase별 진행:
 
 - `docs/specs/sdd-config.yaml` (`/claude-sdd:sdd-init`에서 생성)
 - 기존 스펙 문서 (02~05, 06-checklist, 07-task-plan, 08-review-report)
-- Agent Teams 활성화 (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)
+- Agent Teams 활성화 시 병렬 빌드(팀 모드), 비활성화 시 순차 빌드(솔로 모드)
 - `sdd-change-analyst` 에이전트 (Phase 2)
 - `sdd-test-writer` 에이전트 (Phase 5)
 - `sdd-implementer` 에이전트 (Phase 5)

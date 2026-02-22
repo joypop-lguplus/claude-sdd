@@ -174,7 +174,7 @@ init → intake → spec → plan → assign → build(analysis-only) → change
 |-----------|----------|-------|
 | Claude Code | **Yes** | Plugin host |
 | Node.js 18+ | **Yes** | For CLI tools |
-| Agent Teams | **Yes** | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
+| Agent Teams | Recommended | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` — Team mode (parallel) when enabled, Solo mode (sequential) when disabled |
 | `gh` CLI | Recommended | For PR creation |
 | ast-grep (`sg`) | Optional | For `/claude-sdd:sdd-lint search` and `/claude-sdd:sdd-lint symbols` |
 | mmdc (Mermaid CLI) | Optional | Diagram PNG rendering. `npm i -g @mermaid-js/mermaid-cli` |
@@ -183,7 +183,9 @@ init → intake → spec → plan → assign → build(analysis-only) → change
 | Confluence MCP | Optional | For `/claude-sdd:sdd-intake confluence:...` |
 | Jira MCP | Optional | For `/claude-sdd:sdd-intake jira:...` |
 
-### Enabling Agent Teams
+### Enabling Agent Teams (Recommended)
+
+Enabling Agent Teams allows parallel work package builds for faster progress. When disabled, Solo mode builds sequentially.
 
 ```json
 // ~/.claude/settings.json

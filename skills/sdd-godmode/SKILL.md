@@ -330,7 +330,7 @@ Phase 3으로 진행합니다...
 [3/8] sdd-spec 실행 중... ✓ (집요한 상세 스펙)
 [4/8] sdd-plan 실행 중... ✓
 [5/8] sdd-assign 실행 중... ✓
-[6/8] sdd-build 실행 중... ✓
+[6/8] sdd-build 실행 중... ✓ (Agent Teams 활성화 시 팀 모드, 비활성화 시 솔로 모드)
 [7/8] sdd-review 실행 중... ✓
 [8/8] sdd-integrate 실행 중... ✓
 ```

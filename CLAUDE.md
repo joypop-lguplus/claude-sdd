@@ -37,7 +37,7 @@ node bin/cli.mjs version     # 버전 표시
 /claude-sdd:sdd-spec      → 기술 스펙 + 스펙 준수 체크리스트 생성 + Mermaid 다이어그램 PNG 자동 생성
 /claude-sdd:sdd-plan      → 태스크 분해 → 워크 패키지
 /claude-sdd:sdd-assign    → 워크 패키지에 팀 멤버 배정 + 멤버별 CLAUDE.md 생성
-/claude-sdd:sdd-build     → Agent Teams로 구현 + 품질 루프 (최대 3회 재작업 사이클)
+/claude-sdd:sdd-build     → 구현 + 품질 루프 (팀 모드: Agent Teams 병렬 / 솔로 모드: 순차)
 /claude-sdd:sdd-review    → 품질 게이트 검증 + 자동 진단
 /claude-sdd:sdd-integrate → PR 생성 + 문서화
 /claude-sdd:sdd-change    → 변경 관리 (영향 분석 → 체크리스트 갱신 → TDD 델타 빌드)
@@ -65,7 +65,7 @@ node bin/cli.mjs version     # 버전 표시
 모델은 `sdd-config.yaml`의 `teams.model` (기본: sonnet)과 `teams.lightweight_model` (기본: haiku)로 설정합니다.
 
 ### 품질 루프 (`/claude-sdd:sdd-build`의 핵심 메커니즘)
-리더(Opus)가 팀 멤버(`teams.model`로 설정된 모델, `sdd-implementer`)에게 워크 패키지를 할당합니다. 각 워크 패키지 완료 후 리더가 체크리스트를 검증합니다: 전부 `[x]` = 진행, `[ ]` 잔여 = 구체적 피드백과 함께 재작업, 3회 실패 = 사용자에게 에스컬레이션.
+**팀 모드**(Agent Teams 활성화): 리더(Opus)가 팀 멤버(`teams.model`로 설정된 모델, `sdd-implementer`)에게 워크 패키지를 할당합니다. **솔로 모드**(Agent Teams 비활성화): 현재 세션이 `agents/sdd-implementer.md`를 읽고 각 워크 패키지를 순차적으로 직접 구현합니다. 두 모드 모두 동일한 품질 루프를 적용합니다: 전부 `[x]` = 진행, `[ ]` 잔여 = 재작업(팀: SendMessage, 솔로: 직접 수정), 3회 실패 = 사용자에게 에스컬레이션.
 
 ### TDD 모드 (`/claude-sdd:sdd-build --tdd`)
 `--tdd` 플래그 또는 `sdd-config.yaml teams.tdd: true`로 활성화. Phase A(Red): `sdd-test-writer`가 스펙 기반 실패 테스트 작성 → Phase B(Green): `sdd-implementer`가 테스트 통과 코드 작성 (테스트 수정 금지) → Phase C(Verify): 전체 테스트 실행. 실패 시 Phase B+C 반복 (최대 3회).
