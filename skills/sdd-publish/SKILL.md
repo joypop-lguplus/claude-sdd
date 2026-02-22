@@ -113,6 +113,15 @@ SDD 라이프사이클 산출물을 Confluence에 자동 퍼블리싱합니다. 
 
 `templates/confluence/` 디렉토리의 템플릿을 활용합니다.
 
+> **⚠ CRITICAL: 이 변환은 단순 마크다운→HTML 변환이 아닙니다. Confluence storage format 전용 변환입니다.**
+> - 일반 `<pre><code>` 대신 `<ac:structured-macro ac:name="code">` 사용
+> - 일반 `<img>` 대신 `<ac:image><ri:attachment>` 사용
+> - 일반 `<blockquote>` 대신 `<ac:structured-macro ac:name="info/warning/note">` 사용
+> - 변환 결과에 `<ac:` 접두사 매크로가 **반드시** 포함되어야 합니다
+> - 표준 HTML 태그(`<pre>`, `<img>`, `<blockquote>`)가 최종 출력에 남아있으면 **변환 실패**입니다
+>
+> **절대 하지 말 것**: 마크다운을 일반 HTML로 변환한 뒤 MCP로 업로드하는 것. 반드시 아래 3-1 ~ 3-5 단계를 순서대로 적용한 결과물만 업로드합니다.
+
 #### 3-1. 전처리: 메타데이터 추출
 
 파일에서 메타데이터를 추출합니다:
@@ -133,6 +142,31 @@ SDD 라이프사이클 산출물을 Confluence에 자동 퍼블리싱합니다. 
 | 볼드/이탤릭 | `<strong>`, `<em>` |
 | 링크 (`[text](url)`) | `<a href="url">text</a>` |
 
+**변환 예시 (코드 블록)** — ` ```lang ``` ` 을 반드시 `<ac:structured-macro>`로 변환:
+
+입력 (마크다운):
+````
+```java
+public class UserService {
+    private final UserRepository repo;
+}
+```
+````
+
+출력 (Confluence storage format):
+```xml
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">java</ac:parameter>
+  <ac:parameter ac:name="linenumbers">true</ac:parameter>
+  <ac:parameter ac:name="collapse">false</ac:parameter>
+  <ac:plain-text-body><![CDATA[public class UserService {
+    private final UserRepository repo;
+}]]></ac:plain-text-body>
+</ac:structured-macro>
+```
+
+**주의**: `<pre class="highlight"><code class="language-java">` 형태로 변환하면 안 됩니다. 반드시 `<ac:structured-macro ac:name="code">`를 사용합니다.
+
 #### 3-3. 향상 변환
 
 | 마크다운 소스 | Confluence 출력 | 템플릿 |
@@ -143,7 +177,53 @@ SDD 라이프사이클 산출물을 Confluence에 자동 퍼블리싱합니다. 
 | `> **팁**:` (팁 blockquote) | 팁 패널 | `info-panel.xml.tmpl` (type=tip) |
 | 긴 코드 블록 (20줄 이상) | expand 매크로 안에 code 매크로 중첩 | `expand-macro.xml.tmpl` + `code-block.xml.tmpl` |
 | HTTP 메서드 (`POST`, `GET`, `PUT`, `PATCH`, `DELETE`) | 상태 배지 매크로 | `status-macro.xml.tmpl` |
-| ` ```mermaid ... ``` ` 블록 | 제거 (PNG로 대체됨) | — |
+| ` ```mermaid ... ``` ` 블록 | expand 매크로(접힘) 안에 code 매크로(language=mermaid) 중첩 | `expand-macro.xml.tmpl` + `code-block.xml.tmpl` |
+
+**변환 예시 (Blockquote → 패널)**:
+
+입력 (마크다운):
+```
+> *이 문서는 SDD 도구에 의해 자동 생성되었습니다.*
+```
+
+출력 (Confluence storage format):
+```xml
+<ac:structured-macro ac:name="info">
+  <ac:rich-text-body>
+    <p><em>이 문서는 SDD 도구에 의해 자동 생성되었습니다.</em></p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+```
+
+**주의**: `<blockquote>` 태그로 변환하면 안 됩니다. 반드시 `<ac:structured-macro ac:name="info/warning/note/tip">`을 사용합니다.
+
+**변환 예시 (Mermaid 블록 → 접힌 코드 블록)**:
+
+입력 (마크다운):
+````
+```mermaid
+graph TB
+  A --> B
+```
+````
+
+출력 (Confluence storage format):
+```xml
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">Mermaid 다이어그램 소스</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">mermaid</ac:parameter>
+      <ac:parameter ac:name="linenumbers">false</ac:parameter>
+      <ac:parameter ac:name="collapse">false</ac:parameter>
+      <ac:plain-text-body><![CDATA[graph TB
+  A --> B]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+```
+
+Mermaid 블록은 PNG 다이어그램 바로 아래에 접힌 상태로 표시됩니다. `<pre><code class="language-mermaid">` 형태로 변환하면 안 됩니다.
 
 **HTTP 메서드 색상 매핑** (03-api-spec.md 전용):
 
@@ -172,6 +252,34 @@ SDD 라이프사이클 산출물을 Confluence에 자동 퍼블리싱합니다. 
   npx mmdc -i /tmp/diagram.mmd -o <출력경로>/XX-name.png \
     -b white -s 2 -c {플러그인}/scripts/mermaid-config.json
   ```
+
+**변환 예시 (이미지 → Confluence 첨부 참조)**:
+
+입력 (마크다운):
+```
+![모듈 의존성](diagrams/02-module-dependency.png)
+```
+
+출력 (Confluence storage format):
+```xml
+<ac:image ac:alt="모듈 의존성"><ri:attachment ri:filename="02-module-dependency.png"/></ac:image>
+```
+
+**주의**: `<img src="diagrams/02-module-dependency.png"/>` 형태로 변환하면 안 됩니다. Confluence에서 첨부된 이미지는 반드시 `<ac:image><ri:attachment>` 매크로를 사용해야 표시됩니다.
+
+#### 3.5단계: 변환 결과 검증 (API 호출 전)
+
+변환된 Confluence storage format을 MCP로 전송하기 **전에** 다음을 반드시 확인합니다:
+
+| # | 검증 항목 | 실패 조건 | 원인 |
+|---|----------|----------|------|
+| 1 | `<img src="diagrams/` 패턴이 **없어야** 함 | 있으면 | 3-5단계 미적용 |
+| 2 | `<pre` 또는 `<code class="language-` 패턴이 **없어야** 함 | 있으면 | 3-2단계 미적용 |
+| 3 | `<code class="language-mermaid"` 패턴이 **없어야** 함 (단, `<ac:parameter ac:name="language">mermaid</ac:parameter>`는 정상) | 있으면 | 3-3단계 미적용 |
+| 4 | `<blockquote>` 패턴이 **없어야** 함 | 있으면 | 3-3단계 미적용 |
+| 5 | `<ac:structured-macro` 패턴이 **최소 1회** 있어야 함 | 없으면 | 전체 파이프라인 미적용 |
+
+**하나라도 실패하면** 3단계 변환을 처음부터 재수행합니다. 재수행 후에도 실패하면 사용자에게 에스컬레이션합니다.
 
 ### 파일별 특수 변환 규칙
 
