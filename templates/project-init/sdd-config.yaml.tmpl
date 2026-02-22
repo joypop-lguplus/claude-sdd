@@ -21,7 +21,8 @@ sources:
 # 에이전트 팀 설정
 teams:
   max_members: 3      # 최대 병렬 팀 멤버 수
-  model: "sonnet"     # 팀 멤버용 모델
+  model: "sonnet"     # 팀 멤버용 모델 (구현, 테스트, 리뷰 등 사고가 필요한 작업)
+  lightweight_model: "haiku"  # 경량 작업용 모델 (코드 분석, 린트, 포맷팅 등)
   max_rework_cycles: 3  # 에스컬레이션 전 재작업 시도 횟수
   tdd: false          # TDD 모드 (true: 테스트 먼저 → 구현 → 검증)
 

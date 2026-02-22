@@ -29,12 +29,15 @@ description: >-
 
 1. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`이 활성화되어야 함
 2. `docs/specs/sdd-config.yaml`을 읽어 프로젝트 설정을 확인합니다.
-3. **TDD 모드 감지**: `--tdd` 플래그가 있거나 `sdd-config.yaml`의 `teams.tdd: true`이면 TDD 모드를 활성화합니다.
-4. **레거시 모드 감지**: `sdd-config.yaml`의 `project.type`이 `legacy`이면 레거시 모드를 활성화합니다.
-5. **도메인 모드 감지**: `domains` 키 존재 여부로 단일/멀티 도메인 모드를 결정합니다:
+3. **모델 설정 읽기**: `sdd-config.yaml`의 `teams` 섹션에서 모델을 결정합니다:
+   - `teams.model` (기본: `"sonnet"`) — 구현, 테스트, 리뷰 등 사고가 필요한 작업
+   - `teams.lightweight_model` (기본: `"haiku"`) — 코드 분석, 린트, 포맷팅 등 도구 실행 위주 작업
+4. **TDD 모드 감지**: `--tdd` 플래그가 있거나 `sdd-config.yaml`의 `teams.tdd: true`이면 TDD 모드를 활성화합니다.
+5. **레거시 모드 감지**: `sdd-config.yaml`의 `project.type`이 `legacy`이면 레거시 모드를 활성화합니다.
+6. **도메인 모드 감지**: `domains` 키 존재 여부로 단일/멀티 도메인 모드를 결정합니다:
    - `domains` 없음 또는 빈 배열 → **단일 도메인 모드** (기존 동작)
    - `domains` 존재 → **멀티 도메인 모드**
-6. 태스크 계획 존재 확인:
+7. 태스크 계획 존재 확인:
    - 단일 도메인: `docs/specs/07-task-plan.md` 및 `docs/specs/06-spec-checklist.md`
    - 멀티 도메인: `docs/specs/domains/<domain-id>/07-task-plan.md` 및 `docs/specs/domains/<domain-id>/06-spec-checklist.md`
 
@@ -85,11 +88,18 @@ description: >-
 
 ### 병렬 실행 예시
 
+### 모델 선택 기준
+
+| 작업 유형 | 모델 (설정 키) | 기본값 | 사용 에이전트 |
+|-----------|---------------|--------|-------------|
+| 구현, 테스트 작성, 분석 | `teams.model` | `sonnet` | sdd-implementer, sdd-test-writer |
+| 코드 분석, 린트, 포맷 | `teams.lightweight_model` | `haiku` | sdd-code-analyzer |
+
 ```
 Stage 1 (병렬):
-  ┌─ 팀 멤버 "wp-1" (Sonnet) → WP-1: User 모듈
-  ├─ 팀 멤버 "wp-2" (Sonnet) → WP-2: Auth 모듈
-  └─ 팀 멤버 "wp-3" (Sonnet) → WP-3: Payment 모듈
+  ┌─ 팀 멤버 "wp-1" (teams.model) → WP-1: User 모듈
+  ├─ 팀 멤버 "wp-2" (teams.model) → WP-2: Auth 모듈
+  └─ 팀 멤버 "wp-3" (teams.model) → WP-3: Payment 모듈
   [전원 완료 대기]
 
 체크리스트 검증 → 재작업 필요 시 해당 멤버에게만 메시지 전송
@@ -426,7 +436,8 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
 
 ### 3.5단계: 완료 전 린트 및 포맷
 
-워크 패키지를 완료로 표시하기 전에 코드 품질을 확인합니다:
+워크 패키지를 완료로 표시하기 전에 코드 품질을 확인합니다.
+**이 단계에서는 `teams.lightweight_model` (기본: haiku)을 사용합니다** — 도구 실행과 결과 수집이 주 작업이므로 경량 모델로 충분합니다.
 
 1. **프로젝트 포매터 실행** (설정된 경우): 수정된 파일 자동 포맷
    - `/claude-sdd:sdd-lint format --fix` 또는 프로젝트에 설정된 포매터 사용

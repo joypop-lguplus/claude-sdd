@@ -26,6 +26,10 @@ description: >-
 - ast-grep (`sg`)은 선택 사항이지만 `search` 및 `symbols`에 권장
 - `boostvolt/claude-code-lsps` 플러그인 설치 시 자동 진단이 추가로 활성화됩니다
 
+## 모델
+
+이 스킬은 `sdd-code-analyzer` 에이전트를 사용하며, 경량 모델(`teams.lightweight_model`, 기본: `haiku`)로 실행합니다. 외부 도구 실행과 결과 수집이 주 작업이므로 경량 모델로 충분합니다.
+
 ## 동작
 
 ### 0단계: 도구 감지

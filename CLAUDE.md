@@ -53,17 +53,19 @@ node bin/cli.mjs version     # 버전 표시
 심층 인터뷰를 통해 프로젝트 정보(기술 스택, 도메인 구조, 요구사항 소스, 비기능 요구사항 등)를 한번에 수집한 후 전체 SDD 파이프라인을 자동 실행합니다. `spec_depth: thorough` 모드로 DDL 수준의 상세 스펙을 생성합니다. 레거시 프로젝트에서는 코드 자동 분석으로 기술 스택/도메인/코드 규칙을 감지하여 확인만 받고, MVP/토이 프로젝트에서는 불필요한 엔터프라이즈급 질문을 자동 건너뜁니다. 섹션 7에서 프로젝트 규칙을 인터뷰하고, Phase 2.5에서 프리셋 매칭 후 규칙 파일을 자동 생성합니다.
 
 ### 에이전트 (`agents/` 내 7개)
-Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
-- **sdd-requirements-analyst** -- 외부 소스 파싱 (Confluence/Jira/Figma)
-- **sdd-spec-writer** -- 기술 스펙 문서 생성 (Mermaid 다이어그램 포함)
-- **sdd-implementer** -- 워크 패키지를 구현하는 팀 멤버 (TDD 모드 지원)
-- **sdd-reviewer** -- 체크리스트 대비 스펙 준수 검증 (TDD 준수 확인 포함)
-- **sdd-code-analyzer** -- 자동 진단, ast-grep, LSP, 포매팅 실행
-- **sdd-test-writer** -- TDD 테스트 작성 (스펙 기반 실패 테스트, 구현 코드 생성 금지)
-- **sdd-change-analyst** -- 변경 영향 분석 (LSP/코드 분석, 스펙 델타 생성, 최소 영향 원칙)
+마크다운 기반 에이전트. 사고가 필요한 작업은 Sonnet, 도구 실행 위주의 경량 작업은 Haiku를 사용합니다:
+- **sdd-requirements-analyst** -- 외부 소스 파싱 (Confluence/Jira/Figma) [Sonnet]
+- **sdd-spec-writer** -- 기술 스펙 문서 생성 (Mermaid 다이어그램 포함) [Sonnet]
+- **sdd-implementer** -- 워크 패키지를 구현하는 팀 멤버 (TDD 모드 지원) [Sonnet]
+- **sdd-reviewer** -- 체크리스트 대비 스펙 준수 검증 (TDD 준수 확인 포함) [Sonnet]
+- **sdd-code-analyzer** -- 자동 진단, ast-grep, LSP, 포매팅 실행 [Haiku]
+- **sdd-test-writer** -- TDD 테스트 작성 (스펙 기반 실패 테스트, 구현 코드 생성 금지) [Sonnet]
+- **sdd-change-analyst** -- 변경 영향 분석 (LSP/코드 분석, 스펙 델타 생성, 최소 영향 원칙) [Sonnet]
+
+모델은 `sdd-config.yaml`의 `teams.model` (기본: sonnet)과 `teams.lightweight_model` (기본: haiku)로 설정합니다.
 
 ### 품질 루프 (`/claude-sdd:sdd-build`의 핵심 메커니즘)
-리더(Opus)가 팀 멤버(Sonnet, `sdd-implementer`)에게 워크 패키지를 할당합니다. 각 워크 패키지 완료 후 리더가 체크리스트를 검증합니다: 전부 `[x]` = 진행, `[ ]` 잔여 = 구체적 피드백과 함께 재작업, 3회 실패 = 사용자에게 에스컬레이션.
+리더(Opus)가 팀 멤버(`teams.model`로 설정된 모델, `sdd-implementer`)에게 워크 패키지를 할당합니다. 각 워크 패키지 완료 후 리더가 체크리스트를 검증합니다: 전부 `[x]` = 진행, `[ ]` 잔여 = 구체적 피드백과 함께 재작업, 3회 실패 = 사용자에게 에스컬레이션.
 
 ### TDD 모드 (`/claude-sdd:sdd-build --tdd`)
 `--tdd` 플래그 또는 `sdd-config.yaml teams.tdd: true`로 활성화. Phase A(Red): `sdd-test-writer`가 스펙 기반 실패 테스트 작성 → Phase B(Green): `sdd-implementer`가 테스트 통과 코드 작성 (테스트 수정 금지) → Phase C(Verify): 전체 테스트 실행. 실패 시 Phase B+C 반복 (최대 3회).
