@@ -316,3 +316,82 @@ Phase 3 (Report):   10-analysis-report.md 생성 (충족/미충족 항목 + 갭 
 ```
 
 코드 변경은 빌드 단계에서 수행하지 않으며, 식별된 갭은 `/claude-sdd:sdd-change` 워크플로우를 통해 해소합니다. `--from-analysis` 플래그로 분석 보고서의 갭을 CR로 변환하여 처리합니다.
+
+## 프로젝트 규칙 시스템
+
+### 개요
+
+프로젝트 규칙(Project Rules) 시스템은 `00-project-context.md`(프로젝트가 무엇인가)를 보완하여 `00-project-rules.md`(어떻게 만드는가)를 정의합니다.
+
+- **체크리스트 = What** (무엇을 구현해야 하는가)
+- **프로젝트 규칙 = How** (어떻게 구현해야 하는가)
+
+### 규칙 저장 구조
+
+```
+대상 프로젝트/docs/specs/
+  00-project-rules.md          # 규칙 인덱스 + 메타데이터
+  rules/                       # 카테고리별 상세 규칙
+    architecture.md             # 아키텍처 규칙
+    coding-conventions.md       # 코딩 컨벤션
+    api-design.md               # API 설계 규칙
+    error-handling.md            # 에러 처리
+    testing.md                  # 테스트 규칙
+    security.md                 # 보안 규칙
+    data-model.md               # 데이터 모델
+    performance.md              # 성능 규칙
+    custom/*.md                 # 사용자 정의 규칙
+```
+
+### 규칙 4필드 구조
+
+각 규칙은 다음 4개 필드로 구성됩니다:
+
+| 필드 | 설명 | 예시 |
+|------|------|------|
+| 원칙 | 지켜야 할 규범 | "모든 모듈은 Port-Adapter 패턴을 따른다" |
+| 위반 기준 | 위반으로 판단하는 조건 | "도메인 로직이 인프라에 직접 의존하면 위반" |
+| 검증 방법 | 자동/수동 검증 방법 | "import 방향 확인 — domain은 infra를 import하지 않음" |
+| 예외 | 규칙 적용 예외 | "없음" 또는 구체적 예외 사항 |
+
+### 프리셋 시스템
+
+`templates/rules/presets/`에 언어/프레임워크별 프리셋이 제공됩니다:
+
+| 프리셋 | 대상 기술 스택 |
+|--------|--------------|
+| `java-spring.md.tmpl` | Java + Spring Boot |
+| `typescript-node.md.tmpl` | TypeScript + Node.js (NestJS/Express) |
+| `python-fastapi.md.tmpl` | Python + FastAPI |
+| `kotlin-spring.md.tmpl` | Kotlin + Spring Boot |
+| `go.md.tmpl` | Go (Gin/Echo/Fiber) |
+
+### 규칙 생성 흐름
+
+1. **인터뷰/감지**: `sdd-godmode` 섹션 7(신규) 또는 섹션 7L(레거시 자동 감지)
+2. **프리셋 매칭**: 기술 스택 기반 프리셋 선택
+3. **파일 생성**: 템플릿 + 프리셋 변수 + 인터뷰 커스터마이즈
+4. **설정 활성화**: `sdd-config.yaml`에 `rules:` 섹션 추가
+
+### 규칙 전파 메커니즘
+
+| 에이전트 | 전파 범위 |
+|---------|----------|
+| sdd-implementer | WP 관련 카테고리 규칙 + 인덱스 요약 |
+| sdd-reviewer | 전체 규칙 |
+| sdd-spec-writer | 전체 규칙 |
+| sdd-test-writer | `rules/testing.md`만 |
+| 공통 | `rules/architecture.md` + `rules/coding-conventions.md` 항상 포함 |
+
+### 규칙 검증 시점
+
+| 단계 | 검증 내용 | 설정 |
+|------|----------|------|
+| sdd-spec | 스펙 ↔ 규칙 정합성 검증 | `rules.validation.on_spec` |
+| sdd-build | 구현 코드 ↔ 규칙 준수 검증 (품질 루프) | `rules.validation.on_build` |
+| sdd-review | 전체 규칙 최종 검증 + 6패스 교차 분석 | `rules.validation.on_review` |
+
+### 적용 모드
+
+- **strict**: 규칙 위반 시 FAIL — 재작업 필수
+- **advisory**: 규칙 위반 시 경고만 — 진행 가능

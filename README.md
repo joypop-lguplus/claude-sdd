@@ -91,6 +91,10 @@ claude --plugin-dir .
 | `/claude-sdd:sdd-status` | 진행 상황 대시보드 |
 | `/claude-sdd:sdd-lint` | 코드 분석: 진단, 검색, 심볼, 포맷 |
 
+### 주요 기능
+
+- **프로젝트 규칙 시스템** — 코딩 규칙을 템플릿 기반으로 생성하고, 전체 워크플로우에서 자동 검증 (strict/advisory 모드)
+
 ### 에이전트
 
 | 에이전트 | 역할 |

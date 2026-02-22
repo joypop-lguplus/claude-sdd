@@ -44,6 +44,17 @@ quality:
     - PERF
     - UI
 
+# 프로젝트 규칙 설정 (선택 사항)
+# /claude-sdd:sdd-godmode 인터뷰 또는 수동으로 활성화
+# rules:
+#   enabled: true                    # 프로젝트 규칙 검증 활성화
+#   enforcement: "strict"            # strict(위반=FAIL) | advisory(위반=경고)
+#   preset: ""                       # auto-detect 또는 java-spring/typescript-node/python-fastapi/kotlin-spring/go
+#   validation:
+#     on_spec: true                  # sdd-spec에서 규칙 정합성 검증
+#     on_build: true                 # sdd-build 품질 루프에서 규칙 준수 검증
+#     on_review: true                # sdd-review에서 최종 검증
+
 # 통합 설정
 integration:
   create_pr: true

@@ -1,5 +1,20 @@
 # 변경 이력
 
+## [Unreleased]
+
+### Added
+- **프로젝트 규칙(Project Rules) 시스템** — 코딩 규칙의 체계적 정의/전파/검증
+  - 규칙 4필드 구조: 원칙 / 위반 기준 / 검증 방법 / 예외
+  - 언어별 프리셋: Java+Spring, TypeScript+Node, Python+FastAPI, Kotlin+Spring, Go
+  - 규칙 템플릿: `templates/rules/` (9개 카테고리 + 5개 프리셋 + 도메인 오버라이드)
+  - 갓모드 인터뷰 섹션 7: 프로젝트 규칙 수집 + Phase 2.5 자동 생성
+  - 레거시 자동 감지: 기존 코드에서 규칙 자동 추출 (섹션 7L)
+  - 규칙 전파: CLAUDE.md 템플릿에 에이전트별 규칙 주입
+  - 3단계 검증: sdd-spec(정합성), sdd-build(품질 루프), sdd-review(6패스 분석)
+  - 적용 모드: strict(위반=FAIL) | advisory(위반=경고)
+  - `sdd-config.yaml`에 `rules:` 설정 블록 추가
+  - 멀티 도메인: 도메인별 규칙 오버라이드 지원
+
 ## [0.5.0] - 2026-02-22
 
 ### 추가

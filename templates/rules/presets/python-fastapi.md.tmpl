@@ -1,0 +1,67 @@
+# Python + FastAPI 프리셋 규칙
+
+> 이 프리셋은 Python + FastAPI 프로젝트에 최적화된 규칙을 제공합니다.
+
+## 변수 매핑
+
+```yaml
+# architecture.md.tmpl
+ARCH_HEXAGONAL: false
+ARCH_LAYERED: true
+ARCH_DDD: false
+MODULE_STRUCTURE_DESC: "기능별 패키지 구조 (app/modules/user/, app/modules/auth/)"
+
+# coding-conventions.md.tmpl
+NAMING_CONVENTION_DESC: "클래스는 PascalCase, 함수/변수는 snake_case, 상수는 UPPER_SNAKE_CASE"
+NAMING_PATTERN: "PascalCase(클래스), snake_case(함수/변수)"
+FILE_NAMING_DESC: "snake_case 파일명 (user_controller.py, user_service.py)"
+DTO_SUFFIX: "Schema"
+IMPORT_ORDER_DESC: "표준 라이브러리 → 서드파티 → 로컬 (isort 규칙)"
+
+# api-design.md.tmpl
+URL_PATTERN_DESC: "REST 표준 URL — 복수형 명사, 소문자, 하이픈 구분"
+URL_PATTERN_EXAMPLE: "/api/v1/users, /api/v1/users/{user_id}"
+RESPONSE_FORMAT_DESC: "Pydantic 모델 기반 응답 — BaseResponse[T]"
+ERROR_FORMAT_DESC: "에러 응답 — {detail: {code, message, errors}}"
+API_VERSIONING_DESC: "URL 경로 기반 버저닝 (/api/v1/)"
+
+# error-handling.md.tmpl
+EXCEPTION_HIERARCHY_DESC: "AppException(비즈니스) / SystemException(시스템) 상속, HTTPException 래핑"
+ERROR_CODE_FORMAT_DESC: "에러 코드 형식: MODULE_ERROR_TYPE (예: USER_NOT_FOUND)"
+
+# testing.md.tmpl
+TDD_POLICY_DESC: "pytest 기반, 모든 Service에 단위 테스트, API에 통합 테스트"
+COVERAGE_TARGET_DESC: "라인 커버리지 80% 이상 (pytest-cov)"
+TEST_DATA_POLICY_DESC: "pytest fixtures, factory_boy 패턴, 인메모리 SQLite 또는 Testcontainers"
+
+# security.md.tmpl
+AUDIT_FIELDS_DESC: "모든 모델에 created_at, updated_at 필드 (SQLAlchemy server_default)"
+SOFT_DELETE_DESC: "핵심 모델에 deleted_at 필드 + 커스텀 쿼리 필터"
+AUTH_POLICY_DESC: "OAuth2 + JWT 토큰 (FastAPI Security)"
+AUTHZ_POLICY_DESC: "Depends() 기반 권한 검사 미들웨어"
+
+# data-model.md.tmpl
+ID_STRATEGY_DESC: "UUID v4 (uuid.uuid4) 기본, Integer auto-increment 선택적"
+COMMON_FIELDS_DESC: "id, created_at, updated_at를 BaseMixin으로 공통 관리"
+FK_POLICY_DESC: "SQLAlchemy ForeignKey + relationship()으로 FK 관리"
+INDEX_STRATEGY_DESC: "Index() 또는 __table_args__로 쿼리 패턴 기반 인덱스"
+
+# performance.md.tmpl
+CACHE_STRATEGY_DESC: "Redis 기반 캐시 (aioredis/redis-py)"
+RESPONSE_TIME_DESC: "일반 API 100ms 이내, 목록 API 300ms 이내"
+ASYNC_POLICY_DESC: "Celery 또는 asyncio 기반 비동기 처리"
+```
+
+## Python 전용 추가 규칙
+
+### RULE-PY-001: 타입 힌트
+- **원칙**: 모든 함수 시그니처에 타입 힌트를 사용한다
+- **위반 기준**: 공개 함수에 파라미터/반환 타입 힌트가 없으면 위반
+- **검증 방법**: mypy 또는 pyright 검사
+- **예외**: 테스트 함수, lambda
+
+### RULE-PY-002: Pydantic 모델
+- **원칙**: 요청/응답 데이터는 Pydantic BaseModel로 정의한다
+- **위반 기준**: dict로 직접 요청/응답을 처리하면 위반
+- **검증 방법**: 라우트 핸들러의 파라미터/반환 타입 확인
+- **예외**: 없음

@@ -197,3 +197,31 @@ graph TB
 - API: 해당 도메인이 소유한 엔드포인트만
 - 데이터 모델: 해당 도메인이 소유한 엔티티만
 - 컴포넌트: 해당 도메인 내부 모듈만
+
+## 프로젝트 규칙 참조
+
+`docs/specs/00-project-rules.md`가 존재하면, 스펙 생성 시 프로젝트 규칙과의 일관성을 유지합니다.
+
+### 규칙-스펙 정합성
+
+| 규칙 카테고리 | 스펙 반영 대상 |
+|--------------|--------------|
+| `rules/architecture.md` | `02-architecture.md`의 모듈 구조, 의존성 방향 |
+| `rules/api-design.md` | `03-api-spec.md`의 URL 패턴, 응답 형식, 에러 코드 |
+| `rules/data-model.md` | `04-data-model.md`의 엔티티 설계, ID 전략, 공통 필드 |
+| `rules/error-handling.md` | `03-api-spec.md`의 에러 응답, `05-component-breakdown.md`의 에러 계층 |
+| `rules/security.md` | `03-api-spec.md`의 인증/인가, `04-data-model.md`의 감사 필드 |
+
+### 스펙 작성 시 규칙 적용
+
+1. **아키텍처 스펙**: `rules/architecture.md`의 패턴(헥사고날/계층형/DDD)에 맞는 모듈 구조를 설계합니다.
+2. **API 스펙**: `rules/api-design.md`의 URL 패턴, 응답 형식, 에러 코드 체계를 따릅니다.
+3. **데이터 모델**: `rules/data-model.md`의 ID 전략, 공통 필드, FK 정책을 적용합니다.
+4. **에러 처리**: `rules/error-handling.md`의 예외 계층 구조를 스펙에 반영합니다.
+5. **보안**: `rules/security.md`의 감사 필드, 인증 방식을 스펙에 반영합니다.
+
+### 규칙 불일치 발견 시
+
+스펙 요구사항과 프로젝트 규칙이 충돌하는 경우:
+- 불일치를 스펙 문서에 `> ⚠ 규칙 불일치: RULE-XXX-NNN` 형태로 표시합니다.
+- 호출자(sdd-spec 스킬)에게 불일치를 보고합니다.

@@ -332,6 +332,14 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
       (TDD Phase A: `agents/sdd-test-writer.md` 사용)
    2. 워크 패키지 컨텍스트 추가: 태스크 목록, 스펙 참조 경로, 체크리스트 항목.
    3. 대상 프로젝트에 `docs/specs/wp-N-member.md`(`/claude-sdd:sdd-assign`에서 생성)가 있으면 추가.
+   4. **프로젝트 규칙 주입** (규칙 활성화 시):
+      - `docs/specs/sdd-config.yaml`의 `rules.enabled`가 `true`이면:
+      - `docs/specs/rules/architecture.md` + `docs/specs/rules/coding-conventions.md`를 항상 포함
+      - WP에 해당하는 카테고리 규칙 파일을 선별하여 포함:
+        - API 관련 WP → `rules/api-design.md` 추가
+        - 데이터 모델 WP → `rules/data-model.md` 추가
+        - 보안 관련 WP → `rules/security.md` 추가
+      - `docs/specs/00-project-rules.md`의 요약 테이블을 인덱스로 포함
 
    ```
    # 반드시 하나의 메시지에서 여러 Task를 동시에 호출합니다!
@@ -380,6 +388,24 @@ Task(team_name="sdd-build", name="wp-2", model="sonnet",
 
   [재작업 완료 대기]
 ```
+
+#### 규칙 준수 검증 (규칙 활성화 시)
+
+`sdd-config.yaml`의 `rules.enabled`가 `true`이고 `rules.validation.on_build`가 `true`이면:
+
+1. 수정된 파일 목록에서 관련 규칙을 식별합니다.
+2. Grep/Glob으로 규칙 위반을 확인합니다:
+   - import 방향 (아키텍처 규칙)
+   - 파일/디렉토리 구조 (코딩 컨벤션)
+   - 네이밍 패턴 (코딩 컨벤션)
+3. 위반 발견 시 체크리스트 검증과 동일하게 재작업을 지시합니다:
+   ```
+   "프로젝트 규칙 위반:
+    - RULE-ARCH-001: src/service/UserService.ts에서 Repository를 직접 import
+    docs/specs/rules/architecture.md를 참조하여 수정하세요."
+   ```
+4. `enforcement: "strict"` → 위반 = FAIL (재작업 필수)
+5. `enforcement: "advisory"` → 위반 = 경고 (보고만, 진행 가능)
 
 4. 3회 실패 후:
 ```

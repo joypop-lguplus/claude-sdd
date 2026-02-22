@@ -1,0 +1,67 @@
+# Go 프리셋 규칙
+
+> 이 프리셋은 Go 프로젝트 (Gin/Echo/Fiber)에 최적화된 규칙을 제공합니다.
+
+## 변수 매핑
+
+```yaml
+# architecture.md.tmpl
+ARCH_HEXAGONAL: false
+ARCH_LAYERED: true
+ARCH_DDD: false
+MODULE_STRUCTURE_DESC: "표준 Go 레이아웃 (cmd/, internal/, pkg/)"
+
+# coding-conventions.md.tmpl
+NAMING_CONVENTION_DESC: "exported는 PascalCase, unexported는 camelCase, 패키지는 소문자"
+NAMING_PATTERN: "PascalCase(exported), camelCase(unexported)"
+FILE_NAMING_DESC: "snake_case 파일명 (user_handler.go, user_service.go)"
+DTO_SUFFIX: "Request/Response"
+IMPORT_ORDER_DESC: "표준 라이브러리 → 서드파티 → 내부 패키지 (goimports 규칙)"
+
+# api-design.md.tmpl
+URL_PATTERN_DESC: "REST 표준 URL — 복수형 명사, 소문자, 하이픈 구분"
+URL_PATTERN_EXAMPLE: "/api/v1/users, /api/v1/users/:id"
+RESPONSE_FORMAT_DESC: "표준 응답 구조체 — Response{Data, Message, Code}"
+ERROR_FORMAT_DESC: "에러 응답 — ErrorResponse{Code, Message, Details}"
+API_VERSIONING_DESC: "URL 경로 기반 버저닝 (/api/v1/)"
+
+# error-handling.md.tmpl
+EXCEPTION_HIERARCHY_DESC: "커스텀 에러 타입 (AppError, NotFoundError, ValidationError) + errors.Is/As 패턴"
+ERROR_CODE_FORMAT_DESC: "에러 코드 상수: MODULE_ERROR_TYPE (예: ErrUserNotFound)"
+
+# testing.md.tmpl
+TDD_POLICY_DESC: "표준 testing 패키지, 테이블 기반 테스트, Handler에 httptest 통합 테스트"
+COVERAGE_TARGET_DESC: "라인 커버리지 80% 이상 (go test -coverprofile)"
+TEST_DATA_POLICY_DESC: "테스트 헬퍼 함수, 인메모리 DB (SQLite) 또는 Testcontainers"
+
+# security.md.tmpl
+AUDIT_FIELDS_DESC: "모든 모델에 CreatedAt, UpdatedAt 필드 (GORM autoCreateTime, autoUpdateTime)"
+SOFT_DELETE_DESC: "gorm.DeletedAt 필드로 소프트 삭제 (gorm.Model 포함)"
+AUTH_POLICY_DESC: "JWT 미들웨어 기반 인증"
+AUTHZ_POLICY_DESC: "커스텀 미들웨어로 역할 기반 권한 검사"
+
+# data-model.md.tmpl
+ID_STRATEGY_DESC: "uint (auto-increment) 또는 uuid.UUID"
+COMMON_FIELDS_DESC: "gorm.Model (ID, CreatedAt, UpdatedAt, DeletedAt) 임베딩"
+FK_POLICY_DESC: "GORM 관계 태그 (foreignKey, references)로 FK 관리"
+INDEX_STRATEGY_DESC: "GORM 태그 (index, uniqueIndex)로 인덱스 정의"
+
+# performance.md.tmpl
+CACHE_STRATEGY_DESC: "go-redis 기반 캐시"
+RESPONSE_TIME_DESC: "일반 API 50ms 이내, 목록 API 200ms 이내"
+ASYNC_POLICY_DESC: "goroutine + channel 기반 비동기 처리, errgroup 활용"
+```
+
+## Go 전용 추가 규칙
+
+### RULE-GO-001: 에러 처리
+- **원칙**: error를 반환하는 함수는 반드시 에러를 검사한다
+- **위반 기준**: err를 _ 로 무시하면 위반
+- **검증 방법**: _ 에러 할당 검색, errcheck/golangci-lint
+- **예외**: defer에서의 Close() 호출 (로그만 기록)
+
+### RULE-GO-002: 인터페이스 위치
+- **원칙**: 인터페이스는 사용하는 쪽(consumer)에서 정의한다
+- **위반 기준**: 구현 패키지에서 인터페이스를 정의하면 위반
+- **검증 방법**: 인터페이스 정의 위치와 사용 위치 확인
+- **예외**: 표준 라이브러리 패턴 (io.Reader 등)

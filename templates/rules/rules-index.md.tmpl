@@ -1,0 +1,56 @@
+# 00 — 프로젝트 규칙 (Project Rules)
+
+> **버전**: 1.0
+> **총 규칙 수**: {{TOTAL_RULES}}
+> **프로젝트**: {{PROJECT_NAME}}
+> **프리셋**: {{PRESET}}
+> **적용 모드**: {{ENFORCEMENT}}
+
+## 개요
+
+이 문서는 프로젝트의 모든 코딩 규칙을 정의합니다. 모든 에이전트(구현자, 리뷰어, 테스트 작성자)는 이 규칙을 준수해야 합니다.
+
+- **체크리스트 = What** (무엇을 구현해야 하는가)
+- **프로젝트 규칙 = How** (어떻게 구현해야 하는가)
+- 체크리스트 `[x]`여도 프로젝트 규칙 위반이면 **FAIL**
+
+## 규칙 요약 테이블
+
+| ID | 카테고리 | 한줄 요약 | 상세 |
+|----|----------|----------|------|
+{{#each RULES}}
+| {{this.id}} | {{this.category}} | {{this.summary}} | [상세](rules/{{this.file}}#{{this.anchor}}) |
+{{/each}}
+
+## 카테고리별 규칙 파일
+
+| 카테고리 | 파일 | 규칙 수 | 설명 |
+|----------|------|--------|------|
+| 아키텍처 | [rules/architecture.md](rules/architecture.md) | {{ARCH_COUNT}} | 모듈 구조, 의존성 방향, 계층 규칙 |
+| 코딩 컨벤션 | [rules/coding-conventions.md](rules/coding-conventions.md) | {{CONV_COUNT}} | 네이밍, DTO, 모듈 구조 |
+| API 설계 | [rules/api-design.md](rules/api-design.md) | {{API_COUNT}} | URL 패턴, 응답 형식, 에러 코드 |
+| 에러 처리 | [rules/error-handling.md](rules/error-handling.md) | {{ERR_COUNT}} | 예외 계층, 에러 코드 체계 |
+| 테스트 | [rules/testing.md](rules/testing.md) | {{TEST_COUNT}} | TDD, 커버리지, 테스트 패턴 |
+| 보안 | [rules/security.md](rules/security.md) | {{SEC_COUNT}} | 입력 검증, 감사 필드, 인증 |
+| 데이터 모델 | [rules/data-model.md](rules/data-model.md) | {{DM_COUNT}} | 엔티티 설계, 마이그레이션 |
+| 성능 | [rules/performance.md](rules/performance.md) | {{PERF_COUNT}} | 쿼리 최적화, 캐시, 인덱스 |
+{{#if CUSTOM_RULES}}
+| 커스텀 | [rules/custom/](rules/custom/) | {{CUSTOM_COUNT}} | 사용자 정의 규칙 |
+{{/if}}
+
+## 적용 모드
+
+- **strict**: 규칙 위반 시 FAIL — 재작업 필수
+- **advisory**: 규칙 위반 시 경고 — 보고만 수행
+
+현재 모드: **{{ENFORCEMENT}}**
+
+{{#if DOMAINS}}
+## 도메인별 오버라이드
+
+| 도메인 | 오버라이드 파일 | 추가/변경 규칙 수 |
+|--------|---------------|------------------|
+{{#each DOMAINS}}
+| {{this.name}} | [domains/{{this.id}}/00-rules-override.md](domains/{{this.id}}/00-rules-override.md) | {{this.override_count}} |
+{{/each}}
+{{/if}}

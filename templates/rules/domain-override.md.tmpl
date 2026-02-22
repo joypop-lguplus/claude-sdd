@@ -1,0 +1,53 @@
+# 도메인별 규칙 오버라이드 — {{DOMAIN_NAME}}
+
+> 도메인: {{DOMAIN_ID}}
+> 이 문서는 프로젝트 공통 규칙에 대한 도메인별 추가/구체화를 정의합니다.
+
+## 오버라이드 규칙
+
+아래 규칙은 프로젝트 공통 규칙(`00-project-rules.md`)을 이 도메인에 맞게 구체화하거나 추가합니다.
+
+### 구체화된 규칙
+
+> 프로젝트 공통 규칙을 이 도메인에 맞게 더 구체적으로 정의합니다.
+> 형식: 원본 규칙 ID → 구체화 내용
+
+{{#if OVERRIDDEN_RULES}}
+{{#each OVERRIDDEN_RULES}}
+#### {{this.original_id}} (구체화)
+- **원본 원칙**: {{this.original_principle}}
+- **도메인 구체화**: {{this.override_detail}}
+- **위반 기준**: {{this.violation}}
+- **검증 방법**: {{this.verification}}
+{{/each}}
+{{else}}
+*(이 도메인에서 구체화된 규칙이 없습니다)*
+{{/if}}
+
+### 도메인 추가 규칙
+
+> 이 도메인에만 적용되는 추가 규칙입니다.
+
+{{#if DOMAIN_RULES}}
+{{#each DOMAIN_RULES}}
+#### {{this.id}}: {{this.title}}
+- **원칙**: {{this.principle}}
+- **위반 기준**: {{this.violation}}
+- **검증 방법**: {{this.verification}}
+- **예외**: {{this.exception}}
+{{/each}}
+{{else}}
+*(이 도메인에 추가 규칙이 없습니다)*
+{{/if}}
+
+### 예외 처리
+
+> 프로젝트 공통 규칙 중 이 도메인에서 예외적으로 적용하지 않는 규칙입니다.
+
+{{#if EXEMPTED_RULES}}
+{{#each EXEMPTED_RULES}}
+- **{{this.id}}**: {{this.reason}}
+{{/each}}
+{{else}}
+*(모든 프로젝트 공통 규칙이 이 도메인에 적용됩니다)*
+{{/if}}

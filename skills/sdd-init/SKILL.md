@@ -55,6 +55,8 @@ description: >-
 
 `docs/specs/`가 존재하지 않으면 생성합니다.
 
+`docs/specs/rules/` 디렉토리도 함께 생성합니다.
+
 ### 2단계: SDD 설정 파일 생성
 
 `templates/project-init/sdd-config.yaml.tmpl` 템플릿을 사용하여 `docs/specs/sdd-config.yaml`을 생성합니다.
@@ -63,6 +65,18 @@ description: >-
 1. **프로젝트 이름**: 이 프로젝트의 이름은 무엇인가요?
 2. **설명**: 프로젝트에 대한 간략한 설명
 3. **프로젝트 유형**: 인자에 따라 `new` 또는 `legacy`를 확인
+
+규칙 시스템이 활성화된 경우 `rules:` 섹션을 포함합니다:
+```yaml
+rules:
+  enabled: true
+  enforcement: "strict"
+  preset: ""
+  validation:
+    on_spec: true
+    on_build: true
+    on_review: true
+```
 
 템플릿을 채우고 `docs/specs/sdd-config.yaml`에 저장합니다.
 

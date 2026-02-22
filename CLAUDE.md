@@ -50,7 +50,7 @@ node bin/cli.mjs version     # 버전 표시
 대규모 프로젝트에서 도메인별 독립 라이프사이클을 지원합니다. `sdd-config.yaml`에 `domains` 섹션이 정의되면 멀티 도메인 모드가 활성화됩니다. 각 스킬에 `--domain=<id>`, `--all` 옵션이 추가되어 도메인별 독립 스펙/빌드/리뷰가 가능합니다. 도메인별 스펙은 `docs/specs/domains/<domain-id>/`에, 크로스 도메인 통합은 `docs/specs/cross-domain/`에 위치합니다.
 
 ### 갓모드 (`/claude-sdd:sdd-godmode`)
-심층 인터뷰를 통해 프로젝트 정보(기술 스택, 도메인 구조, 요구사항 소스, 비기능 요구사항 등)를 한번에 수집한 후 전체 SDD 파이프라인을 자동 실행합니다. `spec_depth: thorough` 모드로 DDL 수준의 상세 스펙을 생성합니다. 레거시 프로젝트에서는 코드 자동 분석으로 기술 스택/도메인/코드 규칙을 감지하여 확인만 받고, MVP/토이 프로젝트에서는 불필요한 엔터프라이즈급 질문을 자동 건너뜁니다.
+심층 인터뷰를 통해 프로젝트 정보(기술 스택, 도메인 구조, 요구사항 소스, 비기능 요구사항 등)를 한번에 수집한 후 전체 SDD 파이프라인을 자동 실행합니다. `spec_depth: thorough` 모드로 DDL 수준의 상세 스펙을 생성합니다. 레거시 프로젝트에서는 코드 자동 분석으로 기술 스택/도메인/코드 규칙을 감지하여 확인만 받고, MVP/토이 프로젝트에서는 불필요한 엔터프라이즈급 질문을 자동 건너뜁니다. 섹션 7에서 프로젝트 규칙을 인터뷰하고, Phase 2.5에서 프리셋 매칭 후 규칙 파일을 자동 생성합니다.
 
 ### 에이전트 (`agents/` 내 7개)
 Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
@@ -97,6 +97,35 @@ Sonnet 모델에서 실행되는 마크다운 기반 에이전트:
 
 ### 도구 감지 (`scripts/sdd-detect-tools.sh`)
 프로젝트 언어 및 사용 가능한 린터/포매터를 자동 감지합니다. JSON 출력. TypeScript, Python, Go, Rust, Java, Kotlin, C++ 지원.
+
+### 프로젝트 규칙 시스템 (`templates/rules/`)
+프로젝트의 코딩 규칙을 체계적으로 정의/전파/검증하는 시스템입니다. `00-project-context.md`(무엇인가)를 보완하여 `00-project-rules.md`(어떻게 만드는가)를 정의합니다.
+
+**규칙 저장 구조** (대상 프로젝트):
+```
+docs/specs/
+  00-project-rules.md          (규칙 인덱스 + 핵심 요약 테이블)
+  rules/                       (카테고리별 상세 규칙)
+    architecture.md
+    coding-conventions.md
+    api-design.md
+    error-handling.md
+    testing.md
+    security.md
+    data-model.md
+    performance.md
+    custom/*.md                (사용자 정의 규칙)
+```
+
+**규칙 4필드 구조**: 각 규칙은 원칙 / 위반 기준 / 검증 방법 / 예외의 4필드로 정의됩니다.
+
+**프리셋**: `templates/rules/presets/`에 Java+Spring, TypeScript+Node, Python+FastAPI, Kotlin+Spring, Go 프리셋이 있습니다.
+
+**규칙 생성**: `/claude-sdd:sdd-godmode`의 섹션 7 인터뷰(신규) 또는 섹션 7L 자동 감지(레거시)로 수집 → Phase 2.5에서 프리셋 매칭 후 파일 생성.
+
+**규칙 검증**: `sdd-spec`(스펙 정합성), `sdd-build`(품질 루프), `sdd-review`(최종 검증)에서 자동 검증.
+
+**적용 모드**: `sdd-config.yaml`의 `rules.enforcement` — `strict`(위반=FAIL) | `advisory`(위반=경고).
 
 ### LSP 통합
 `boostvolt/claude-code-lsps` 마켓플레이스 플러그인을 통해 Claude Code 내장 LSP를 활용합니다.
@@ -158,6 +187,7 @@ SDD 산출물을 Confluence에 자동 퍼블리싱합니다. `sdd-config.yaml`�
 | `skills/*.md` | `CLAUDE.md`, `docs/usage-guide.md`, `docs/workflow-guide.md` |
 | `agents/*.md` | `CLAUDE.md`, `docs/architecture.md` |
 | `templates/*.tmpl` | `CLAUDE.md`, `docs/architecture.md` |
+| `templates/rules/*` | `CLAUDE.md`, `docs/architecture.md` |
 | 워크플로우/라이프사이클 변경 | `docs/workflow-guide.md`, `docs/sdd-methodology.md` |
 | 아키텍처/구조 변경 | `docs/architecture.md` |
 | 신규 기능/모드/용어 추가 | `README.md`, `README.en.md`, `CHANGELOG.md`, `docs/glossary-ko.md` |

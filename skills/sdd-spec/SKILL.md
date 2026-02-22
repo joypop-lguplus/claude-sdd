@@ -282,6 +282,38 @@ description: >-
 
 ---
 
+## 프로젝트 규칙 정합성 검증
+
+`docs/specs/sdd-config.yaml`의 `rules.enabled`가 `true`이고 `rules.validation.on_spec`이 `true`이면, 스펙 생성 완료 후 프로젝트 규칙과의 정합성을 자동 검증합니다.
+
+### 검증 대상
+
+| 규칙 카테고리 | 검증 대상 스펙 | 검증 내용 |
+|--------------|--------------|----------|
+| `rules/api-design.md` | `03-api-spec.md` | URL 패턴, 응답 형식, 에러 코드 체계가 규칙과 일치하는지 |
+| `rules/data-model.md` | `04-data-model.md` | 엔티티 ID 전략, 공통 필드, FK 정책이 규칙과 일치하는지 |
+| `rules/architecture.md` | `02-architecture.md` | 모듈 구조, 의존성 방향이 규칙과 일치하는지 |
+| `rules/security.md` | `03-api-spec.md`, `04-data-model.md` | 인증/인가, 감사 필드 요구사항이 스펙에 반영되었는지 |
+| `rules/error-handling.md` | `03-api-spec.md`, `05-component-breakdown.md` | 에러 처리 전략이 스펙에 반영되었는지 |
+
+### 검증 결과
+
+```
+프로젝트 규칙 정합성 검증:
+  api-design ↔ 03-api-spec.md:       ✓ 일치
+  data-model ↔ 04-data-model.md:     ✓ 일치
+  architecture ↔ 02-architecture.md: ✓ 일치
+  security ↔ 03/04-spec.md:          ⚠ RULE-SEC-010 감사 필드 누락 (advisory)
+  error-handling ↔ 03/05-spec.md:    ✓ 일치
+```
+
+### 불일치 처리
+
+- **strict 모드**: 불일치 항목을 수정한 후 다음 단계로 진행
+- **advisory 모드**: 불일치를 경고로 보고하고 진행
+
+---
+
 ## 스펙 검토
 
 생성 후 요약을 표시합니다:

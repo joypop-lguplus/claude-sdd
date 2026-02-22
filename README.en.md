@@ -91,6 +91,10 @@ claude --plugin-dir .
 | `/claude-sdd:sdd-status` | Status dashboard with progress tracking |
 | `/claude-sdd:sdd-lint` | Code analysis: diagnostics, search, symbols, format |
 
+### Key Features
+
+- **Project Rules System** — Generate coding rules from templates, auto-validate across the entire workflow (strict/advisory modes)
+
 ### Agents
 
 | Agent | Role |

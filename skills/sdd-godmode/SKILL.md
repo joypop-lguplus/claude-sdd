@@ -57,6 +57,7 @@ description: >-
 - **섹션 2** → "섹션 2L: 기술 스택 자동 감지"로 대체
 - **섹션 3** → "섹션 3L: 도메인 구조 자동 감지"로 대체
 - **섹션 6** → "섹션 6L: 코드 규칙 자동 감지"로 대체
+- **섹션 7** → "섹션 7L: 프로젝트 규칙 자동 감지"로 대체
 
 섹션 4(요구사항 소스), 4.5(Confluence), 5(비기능 요구사항)는 그대로 진행합니다.
 
@@ -199,6 +200,49 @@ description: >-
    - 옵션: "기존 규칙 유지" / "수정할 부분이 있습니다"
    - "수정할 부분이 있습니다" 선택 시에만 추가 질문
 
+#### 섹션 7: 프로젝트 규칙 (Project Rules)
+
+> **규모 적응**: MVP/토이 프로젝트에서는 이 섹션을 간소화합니다:
+> "코딩 규칙에 대해 특별히 지정할 사항이 있나요? (아키텍처 패턴, 네이밍, 에러 처리 등)" — "없음"이면 프리셋 자동 적용
+
+다음 항목을 순서대로 질문합니다:
+
+1. **아키텍처 패턴** — 헥사고날? 계층형? DDD? 기타?
+2. **코딩 컨벤션** — 네이밍 규칙, DTO 분리 정책, 모듈 구조 규칙
+3. **API 설계 규칙** — URL 패턴, 응답 형식, 에러 코드 체계
+4. **에러 처리** — 예외 계층 구조, 글로벌 핸들러 정책
+5. **테스트 규칙** — TDD 정책, 커버리지 목표, 테스트 패턴
+6. **보안** — 입력 검증, 감사 필드, 인증/인가 방식
+7. **기타 규칙** — 성능, 데이터 모델 등 추가 규칙
+
+#### 섹션 7L: 프로젝트 규칙 자동 감지 (레거시 전용)
+
+> 레거시 프로젝트에서 섹션 7 대신 사용됩니다.
+
+1. **자동 분석 수행:**
+   - 패키지 구조에서 아키텍처 패턴 감지 (계층형/기능별/DDD)
+   - import 패턴에서 네이밍 컨벤션 감지 (camelCase/snake_case/PascalCase)
+   - 컨트롤러/라우터에서 API URL 패턴 감지
+   - 에러 핸들러/미들웨어에서 에러 처리 방식 감지
+   - 테스트 디렉토리에서 테스트 패턴/프레임워크 감지
+   - 보안 설정에서 인증/인가 방식 감지
+
+2. **감지 결과를 요약하여 사용자에게 제시:**
+   ```
+   코드에서 감지된 프로젝트 규칙:
+   - 아키텍처: 계층형 (Controller → Service → Repository)
+   - 네이밍: camelCase (함수/변수), PascalCase (클래스)
+   - API: REST (/api/v1/..., JSON 응답)
+   - 에러: 커스텀 예외 계층 (BusinessException)
+   - 테스트: Jest, describe/it 패턴
+   - 보안: JWT 인증, @Guard 데코레이터
+
+   수정할 부분이 있으면 알려주세요.
+   ```
+
+3. **사용자 확인:** `AskUserQuestion`으로 "감지된 규칙이 맞나요?" 한 번만 질문
+   - 옵션: "맞습니다" / "수정할 부분이 있습니다"
+
 ### Phase 2: 프로젝트 컨텍스트 저장
 
 인터뷰에서 수집한 모든 정보를 `templates/specs/project-context.md.tmpl` 템플릿을 사용하여 `docs/specs/00-project-context.md`에 저장합니다.
@@ -216,6 +260,60 @@ description: >-
   - 기술 스택: [언어] + [프레임워크] + [DB]
   - 도메인: [N]개
   - spec_depth: thorough
+
+Phase 3으로 진행합니다...
+```
+
+### Phase 2.5: 프로젝트 규칙 생성
+
+인터뷰에서 수집한 규칙 정보를 프로젝트 규칙 파일로 변환합니다.
+
+1. **프리셋 매칭**: 기술 스택 기반으로 `templates/rules/presets/` 중 적합한 프리셋을 선택합니다.
+   - Java + Spring → `java-spring.md.tmpl`
+   - TypeScript + Node → `typescript-node.md.tmpl`
+   - Python + FastAPI → `python-fastapi.md.tmpl`
+   - Kotlin + Spring → `kotlin-spring.md.tmpl`
+   - Go → `go.md.tmpl`
+   - 매칭 불가 → 기본 템플릿 사용
+
+2. **규칙 파일 생성**: `templates/rules/` 템플릿을 사용하여 다음 파일을 생성합니다:
+   - `docs/specs/00-project-rules.md` — 인덱스 (`templates/rules/rules-index.md.tmpl`)
+   - `docs/specs/rules/architecture.md` — 아키텍처 규칙
+   - `docs/specs/rules/coding-conventions.md` — 코딩 컨벤션
+   - `docs/specs/rules/api-design.md` — API 설계 규칙
+   - `docs/specs/rules/error-handling.md` — 에러 처리
+   - `docs/specs/rules/testing.md` — 테스트 규칙
+   - `docs/specs/rules/security.md` — 보안 규칙
+   - `docs/specs/rules/data-model.md` — 데이터 모델
+   - `docs/specs/rules/performance.md` — 성능 규칙
+
+3. **프리셋 변수 적용**: 프리셋의 변수 매핑을 각 규칙 파일의 `{{VARIABLE}}`에 적용합니다.
+
+4. **인터뷰 커스터마이즈 반영**: 사용자가 인터뷰에서 수정/추가한 규칙을 `CUSTOM_*_RULES` 섹션에 추가합니다.
+
+5. **sdd-config.yaml 설정**: `rules` 섹션을 활성화합니다:
+   ```yaml
+   rules:
+     enabled: true
+     enforcement: "strict"
+     preset: "<detected-preset>"
+     validation:
+       on_spec: true
+       on_build: true
+       on_review: true
+   ```
+
+6. **도메인별 오버라이드** (멀티 도메인인 경우):
+   - 각 도메인에 `docs/specs/domains/<id>/00-rules-override.md` 생성 여부 확인
+   - 필요 시 `templates/rules/domain-override.md.tmpl` 사용
+
+저장 후 출력:
+```
+프로젝트 규칙이 생성되었습니다: docs/specs/00-project-rules.md
+  - 프리셋: [프리셋명]
+  - 카테고리: 8개
+  - 규칙 수: [N]개
+  - 적용 모드: strict
 
 Phase 3으로 진행합니다...
 ```
@@ -320,6 +418,8 @@ Phase 3으로 진행합니다...
 ## 출력
 
 - `docs/specs/00-project-context.md`
+- `docs/specs/00-project-rules.md`
+- `docs/specs/rules/*`
 - 모든 표준 SDD 스펙 파일 (01~08)
 - 소스 코드, 테스트, PR (전체 라이프사이클)
 

@@ -47,6 +47,13 @@ description: >-
 
 2. `/claude-sdd:sdd-build`에서 사용할 수 있도록 `docs/specs/wp-N-member.md`로 저장합니다.
 
+3. 프로젝트 규칙 포함 (규칙 활성화 시):
+   - `sdd-config.yaml`의 `rules.enabled`가 `true`이면:
+   - `{{RULES_ENABLED}}` → `true`
+   - `{{RULES_ENFORCEMENT}}` → `sdd-config.yaml`의 `rules.enforcement` 값
+   - `{{RULES_SUMMARY}}` → `00-project-rules.md`의 요약 테이블
+   - `{{RULES_DETAIL}}` → WP 카테고리에 해당하는 규칙 상세 파일 내용
+
 ### 출력 요약
 
 ```

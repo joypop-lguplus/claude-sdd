@@ -112,6 +112,36 @@
 소규모 갭(5개 이하)인 경우 `--lightweight` 플래그를 추가하여 빠르게 처리합니다.
 {{/if}}
 
+{{#if RULES_ENABLED}}
+## 프로젝트 규칙 검증 의무
+
+이 프로젝트에는 **프로젝트 규칙 시스템**이 활성화되어 있습니다. 규칙 적용 모드: **{{RULES_ENFORCEMENT}}**
+
+### 규칙 참조
+- 규칙 인덱스: `docs/specs/00-project-rules.md`
+- 상세 규칙: `docs/specs/rules/` 디렉토리
+
+### 검증 의무
+1. **팀 멤버 할당 시**: 워크 패키지와 관련된 규칙 카테고리를 프롬프트에 포함합니다.
+2. **품질 검증 시**: 체크리스트 `[x]` 확인과 함께 프로젝트 규칙 준수를 검증합니다.
+3. **위반 발견 시**: 다음 형식으로 재작업을 지시합니다:
+   ```
+   "프로젝트 규칙 위반이 발견되었습니다.
+    RULE-ARCH-001: Controller에서 Repository를 직접 호출하고 있습니다.
+    RULE-CONV-010: API 응답에 엔티티를 직접 반환하고 있습니다.
+    해당 규칙을 확인하고 수정하세요:
+    - docs/specs/rules/architecture.md#RULE-ARCH-001
+    - docs/specs/rules/coding-conventions.md#RULE-CONV-010"
+   ```
+
+### 규칙 전파 전략
+- **구현자(sdd-implementer)**: WP 관련 카테고리 규칙만 + 인덱스 요약 전파
+- **리뷰어(sdd-reviewer)**: 전체 규칙 전파
+- **스펙 작성자(sdd-spec-writer)**: 전체 규칙 전파
+- **테스트 작성자(sdd-test-writer)**: `rules/testing.md`만 전파
+- `rules/architecture.md` + `rules/coding-conventions.md`는 모든 에이전트에 항상 포함
+{{/if}}
+
 ## 코드 분석 도구
 
 팀 멤버에게 워크 패키지 할당 시, **LSP 도구를 적극 활용하여** 기존 코드를 파악하도록 지시합니다:

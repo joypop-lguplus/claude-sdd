@@ -1,0 +1,68 @@
+# Java + Spring 프리셋 규칙
+
+> 이 프리셋은 Java + Spring Boot 프로젝트에 최적화된 규칙을 제공합니다.
+> 프리셋 적용 시 각 카테고리 템플릿의 변수를 아래 값으로 채웁니다.
+
+## 변수 매핑
+
+```yaml
+# architecture.md.tmpl
+ARCH_HEXAGONAL: false
+ARCH_LAYERED: true
+ARCH_DDD: false
+MODULE_STRUCTURE_DESC: "기능별 패키지 구조 (com.project.domain.module)"
+
+# coding-conventions.md.tmpl
+NAMING_CONVENTION_DESC: "클래스는 PascalCase, 메서드/변수는 camelCase, 상수는 UPPER_SNAKE_CASE"
+NAMING_PATTERN: "PascalCase(클래스), camelCase(메서드/변수)"
+FILE_NAMING_DESC: "클래스명과 동일한 파일명 (UserController.java)"
+DTO_SUFFIX: "Dto"
+IMPORT_ORDER_DESC: "java → javax → org → com → 프로젝트 패키지"
+
+# api-design.md.tmpl
+URL_PATTERN_DESC: "REST 표준 URL — 복수형 명사, 소문자, 하이픈 구분"
+URL_PATTERN_EXAMPLE: "/api/v1/users, /api/v1/users/{id}"
+RESPONSE_FORMAT_DESC: "표준 응답 래퍼 사용 — {data, message, timestamp}"
+ERROR_FORMAT_DESC: "에러 응답 — {error: {code, message, details}}"
+API_VERSIONING_DESC: "URL 경로 기반 버저닝 (/api/v1/)"
+
+# error-handling.md.tmpl
+EXCEPTION_HIERARCHY_DESC: "BusinessException(비즈니스) / SystemException(시스템) 상속 구조"
+ERROR_CODE_FORMAT_DESC: "에러 코드 형식: MODULE_ERROR_TYPE (예: USER_NOT_FOUND, AUTH_TOKEN_EXPIRED)"
+
+# testing.md.tmpl
+TDD_POLICY_DESC: "모든 Service/Repository에 단위 테스트 필수, Controller에 통합 테스트 필수"
+COVERAGE_TARGET_DESC: "라인 커버리지 80% 이상 (Controller/Service/Repository)"
+TEST_DATA_POLICY_DESC: "@DataJpaTest, @WebMvcTest, Testcontainers 활용"
+
+# security.md.tmpl
+AUDIT_FIELDS_DESC: "모든 엔티티에 createdAt, updatedAt, createdBy, updatedBy 필드 포함 (@CreatedDate, @LastModifiedDate)"
+SOFT_DELETE_DESC: "핵심 엔티티에 deletedAt 필드로 소프트 삭제 적용 (@SQLDelete, @Where)"
+AUTH_POLICY_DESC: "Spring Security + JWT 토큰 기반 인증"
+AUTHZ_POLICY_DESC: "@PreAuthorize 또는 커스텀 어노테이션으로 메서드 수준 권한 검사"
+
+# data-model.md.tmpl
+ID_STRATEGY_DESC: "Long 타입 auto-increment 또는 UUID (분산 환경)"
+COMMON_FIELDS_DESC: "id, createdAt, updatedAt를 BaseEntity로 공통 관리"
+FK_POLICY_DESC: "논리적 FK 사용, DB 레벨 FK 제약은 선택적"
+INDEX_STRATEGY_DESC: "WHERE/JOIN에 사용되는 필드에 인덱스, 복합 인덱스는 카디널리티 높은 순"
+
+# performance.md.tmpl
+CACHE_STRATEGY_DESC: "@Cacheable 기반 메서드 수준 캐시, Redis 활용"
+RESPONSE_TIME_DESC: "일반 API 200ms 이내, 목록 API 500ms 이내"
+ASYNC_POLICY_DESC: "@Async 또는 이벤트 큐로 3초 이상 작업 비동기 처리"
+```
+
+## Spring 전용 추가 규칙
+
+### RULE-SPRING-001: @Transactional 위치
+- **원칙**: @Transactional은 Service 계층에만 선언한다
+- **위반 기준**: Controller 또는 Repository에 @Transactional이 있으면 위반
+- **검증 방법**: @Transactional 어노테이션 위치 확인
+- **예외**: @Transactional(readOnly = true)는 Repository에 허용
+
+### RULE-SPRING-002: 생성자 주입
+- **원칙**: @Autowired 필드 주입 대신 생성자 주입을 사용한다
+- **위반 기준**: @Autowired 필드 주입이 있으면 위반
+- **검증 방법**: @Autowired 필드 선언 검색
+- **예외**: 테스트 클래스

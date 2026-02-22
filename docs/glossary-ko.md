@@ -159,6 +159,16 @@
 | Feature Branch | 피처 브랜치 | `feature/**` 패턴의 작업 브랜치 |
 | Branch Management | 브랜치 관리 | sdd-init/godmode/change 실행 시 자동 브랜치 확인/생성 |
 
+## 프로젝트 규칙
+
+| 영어 | 한국어 | 비고 |
+|------|--------|------|
+| 프로젝트 규칙 (Project Rules) | 프로젝트 규칙 | 프로젝트의 코딩 규칙을 체계적으로 정의한 문서 세트. `00-project-rules.md`(인덱스)와 `rules/` 디렉토리(상세)로 구성. |
+| 규칙 4필드 구조 | 규칙 4필드 구조 | 각 규칙의 원칙/위반 기준/검증 방법/예외를 정의하는 표준 형식. |
+| 프리셋 (Preset) | 프리셋 | 언어/프레임워크별 규칙 기본값 세트 (java-spring, typescript-node, python-fastapi, kotlin-spring, go). |
+| 규칙 적용 모드 (Enforcement) | 규칙 적용 모드 | strict(위반=FAIL) 또는 advisory(위반=경고) 중 선택. `sdd-config.yaml`의 `rules.enforcement`로 설정. |
+| 6패스 교차 분석 | 6패스 교차 분석 | sdd-review 단계에서 프로젝트 규칙을 검증하는 6단계 분석 프로세스: 중복/모호성/미명세/정합성/커버리지/불일치. |
+
 ## 인스톨러
 
 | 영어 | 한국어 | 비고 |

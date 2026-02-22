@@ -34,11 +34,11 @@
 심층 인터뷰(기술 스택, 도메인 구조, 요구사항 소스, 비기능 요구사항 등)를 진행한 후, 전체 SDD 파이프라인을 **자동으로 끝까지** 실행합니다.
 
 ```
-인터뷰 (6개 섹션)
-  → sdd-init → sdd-intake → sdd-spec → sdd-plan → sdd-assign → sdd-build → sdd-review → sdd-integrate
+인터뷰 (7개 섹션, 섹션 7: 프로젝트 규칙)
+  → sdd-init → Phase 2.5: 규칙 파일 생성 → sdd-intake → sdd-spec → sdd-plan → sdd-assign → sdd-build → sdd-review → sdd-integrate
 ```
 
-갓모드는 `spec_depth: thorough`로 DDL 수준의 상세 스펙을 생성합니다.
+갓모드는 `spec_depth: thorough`로 DDL 수준의 상세 스펙을 생성합니다. 섹션 7에서 프로젝트 규칙(아키텍처, 코딩 컨벤션, API 설계, 에러 처리, 테스트, 보안)을 인터뷰하고, Phase 2.5에서 기술 스택에 맞는 프리셋을 매칭하여 규칙 파일을 자동 생성합니다.
 
 > **레거시 프로젝트에서의 godmode**: 레거시 프로젝트에서는 기술 스택(섹션 2), 도메인 구조(섹션 3), 코드 규칙(섹션 6)을 질문하지 않고 기존 코드를 자동 분석합니다. 감지 결과를 제시하고 확인만 받으므로 인터뷰가 빠르게 진행됩니다. MVP/토이 프로젝트에서는 캐시, 인프라, 관측성 등 불필요한 질문이 자동으로 건너뛰어집니다.
 
@@ -335,6 +335,15 @@ SDD의 모든 단계는 **독립적으로 재진입 가능**합니다:
 # 스펙 재생성 (요구사항 변경 시)
 /claude-sdd:sdd-spec
 ```
+
+### 프로젝트 규칙 검증
+
+각 단계에서 프로젝트 규칙(`docs/specs/00-project-rules.md`)이 자동 검증됩니다:
+- **sdd-spec**: 스펙 ↔ 규칙 정합성 검증 (스펙이 규칙에 부합하는지)
+- **sdd-build**: 구현 코드 ↔ 규칙 준수 검증 (품질 루프에 규칙 체크 포함)
+- **sdd-review**: 전체 규칙 최종 검증 + 6패스 교차 분석
+
+적용 모드(`sdd-config.yaml`의 `rules.enforcement`)에 따라 `strict`(위반=FAIL)이면 재작업이 필요하고, `advisory`(위반=경고)이면 진행 가능합니다.
 
 ### 리뷰 → 빌드 루프백
 
